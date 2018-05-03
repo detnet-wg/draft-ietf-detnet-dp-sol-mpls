@@ -926,7 +926,132 @@ Placeholder
    </t>
   </section>
 
-   <section title="Service layer considerations">
+  <section anchor="FAG" title="Flow Aggregation">
+   <t>
+    The ability to aggregate individual flows, and their associated
+    resource control, into a larger aggregate is an important technique
+    for improving scaling of control in the data, management and control
+    planes.  The DetNet data plane allows for the aggregation of DetNet flows,
+    to improved scaling. There are three methods of introducing flow aggregation:
+   </t>
+   <t>
+    <list style="numbers">
+     <t>Aggregate at the LSP (Transport)</t>
+     <t>Aggregating DetNet flows as a new DetNet flow</t>
+     <t>Simple Aggregation at the DetNet layer</t>
+    </list>
+   </t>
+   <t>
+    A further method of using SR to perform aggregation is for further study.
+   </t>
+   <t>
+    The resource control and
+    management aspects of aggregation (including the queuing/shaping/
+    policing implications) will be covered in other documents.
+   </t>
+  </section>
+  <section anchor="aggregation-at-the-lsp" title="Aggregation at the LSP">
+   <t>
+    DetNet flows transported via MPLS can leverage MPLS-TE?s existing
+    support for hierarchical LSPs (H-LSPs), see <xref target="RFC4206"/>.  H-LSPs are
+    typically used to aggregate control and resources, they may also be
+    used to provide OAM or protection for the aggregated LSPs.  Arbitrary
+    levels of aggregation naturally falls out of the definition for
+    hierarchy and the MPLS label stack <xref target="RFC3032"/>.  DetNet nodes which
+    support aggregation (LSP hierarchy) map one or more LSPs (labels)
+    into and from an H-LSP.  Both carried LSPs and H-LSPs may or may not
+    use the TC field, i.e., L-LSPs or E-LSPs.  Such nodes will need to
+    ensure that traffic from aggregated LSPs are placed (shaped/policed/
+    enqueued) onto the H-LSPs in a fashion that ensures the required
+    DetNet service is preserved.
+   </t>
+   <t>
+    Additional details of the traffic
+    control capabilities needed at a DetNet-aware node may be covered in
+    the new service descriptions mentioned above or in separate future
+    documents.  Management and control plane mechanisms will also need to
+    ensure that the service required on the aggregate flow (H-LSP or
+    DSCP) are provided, which may include the discarding or remarking
+    mentioned in the previous sections.
+   </t>
+  </section>
+  <section anchor="aggregating-detnet-flows-as-a-new-detnet-flow" title="Aggregating DetNet flows as a new DetNet flow">
+   <t>
+    An aggregate can be built by layering DetNet flows as shown below:
+   </t>
+
+<figure><artwork><![CDATA[
++---------------------------------+
+|                                 |
+|           DetNet Flow           |
+|         Payload  Packet         |
+|                                 |
++---------------------------------+ <--\
+|       DetNet Control Word       |    |
++=================================+    |
+|            S-Label              |    |    
++---------------------------------+    +----DetNet data plane
+|       DetNet Control Word       |    |    MPLS encapsulation
++=================================+    |
+|            A-Label              |    |
++---------------------------------+ <--/
+|           T-Label(s)            |
++---------------------------------+
+|           Data-Link             |
++---------------------------------+
+|           Physical              |
++---------------------------------+
+]]></artwork></figure>
+
+   <t>
+    Both the Aggregation (A) label and the S-label have their MPLS S bit
+    set indicating bottom of stack, and the d-CW allows the PREF functions 
+    to work.
+   </t>
+   <t>
+    It is a property of the A-label that what follows is d-CW followed
+    by an S-label. A relay node processing the A-label would not know
+    the underlying payload type. This would only be known to a node
+    that was a peer of the node imposing the S-label. However there
+    is no real need for it to know the payload type during aggregation processing.
+   </t>
+  </section>
+
+ <section anchor="simple-aggregation-at-the-detnet-layer" title="Simple Aggregation at the DetNet layer">
+  <t>
+   Another approach would be not to include a d-CW for the aggregated flow.
+   This would be functionally similar to aggregation at the transport layer
+   using H-LSPs, but would confine knowledge of the aggregation to the 
+   DetNet layer. Such an approach shares the disadvantage that PREF 
+   operations would not be possible. OAM operation in this mode is 
+   for further study.
+  </t>
+
+<figure><artwork><![CDATA[
+ +---------------------------------+
+ |                                 |
+ |           DetNet Flow           |
+ |         Payload  Packet         |
+ |                                 |
+ +---------------------------------+ <--\
+ |       DetNet Control Word       |    |
+ +=================================+    |
+ |            S-Label              |    +----DetNet data plane    
+ +---------------------------------+    |    MPLS encapsulation
+ |            A-Label              |    |
+ +---------------------------------+ <--/
+ |           T-Label(s)            |
+ +---------------------------------+
+ |           Data-Link             |
+ +---------------------------------+
+ |           Physical              |
+ +---------------------------------+
+]]></artwork></figure>
+
+ </section>
+
+
+ <section title="Service layer considerations">
    <t>
     [Editor's note: quite a bit of unfinished and old text in the following sections.]
    </t>
