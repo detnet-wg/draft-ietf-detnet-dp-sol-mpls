@@ -120,7 +120,7 @@
  <section title="Introduction" anchor="sec_intro">
   <t>
     Deterministic Networking (DetNet) is a service that can be offered by a network to DetNet flows.
-    DetNet provides these flows extremely low packet loss rates and assured maximum end-to-end
+    DetNet provides these flows extremely an low packet loss rates and assured maximum end-to-end
     delivery latency.  General background and concepts of DetNet can be found in <xref
     target="I-D.ietf-detnet-architecture"/>.
   </t>
@@ -166,9 +166,18 @@
     also used to identify a DetNet flow at DetNet service layer.</t>
 	
     <t hangText="Local-ID">
-     A DetNet Edge and Relay node internal construct that uniquely identifies a DetNet flow within a
-     node and never appear on-wire. It may be used to select proper forwarding and/or DetNet
-     specific service function.</t>
+
+        [Note to the editors this section is not needed. This is internal to the node. With
+        pseudowires we needed global identifier for the control plane to identfy the PW to
+        the node, and we used platform label space to ensure the PW was identiable when
+        it was received. I think this can be deleted - SB]
+     </t>
+
+     <t>
+        A DetNet Edge and Relay node internal construct that uniquely identifies a DetNet flow within a
+        node and never appear on-wire. It may be used to select proper forwarding and/or DetNet
+        specific service function.
+     </t>
 
     <t hangText="PREF">
      A Packet Replication and Elimination Function (PREF) does the replication
@@ -179,7 +188,7 @@
 	 DetNet compound flow.</t>
     
     <t hangText="DetNet Control Word">
-	  A control word used for sequencing and identifying duplaicate packets at the DetNet service
+	  A control word used for sequencing and identifying duplicate packets at the DetNet service
       layer. </t> 
     </list>
    </t>
@@ -421,6 +430,10 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
   ensuring congestion protection and latency control for the above listed DetNet functions.
  </t>
  <t>
+  [Note to Editors. I am not convinced that the previous para adds value. It certainly has
+  the opportunity to add confusion. I think it needs to be deleted - SB] 
+ </t>
+ <t>
   The DetNet data plane allows for the aggregation of DetNet flows, e.g., via MPLS hierarchical
   LSPs, to improved scaling.  When DetNet flows are aggregated, transit nodes may have limited
   ability to provide service on per-flow DetNet identifiers. Therefore, identifying each individual
@@ -442,6 +455,9 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
   On each DetNet node dealing with DetNet flows, an internal local-ID is assumed to determine what
   local operation a packet goes through. Therefore, local-IDs has to be unique on each edge and
   relay nodes. Local-ID is unambiguously bound to the DetNet flow. 
+ </t>
+ <t>
+   [Note to Editor - again I think previous para needs to be removed]
  </t>
  </section>
 
@@ -466,6 +482,9 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
    local-ID if they belong to the same DetNet (compound) flow and share the same sequence number
    counter and the history information. The location of the packet elimination on the packet
    processing pipeline is implementation specific.
+  </t>
+  <t>
+   [Note to editor - Clean up local-id when dealing with PREF text] 
   </t>
  </section>
  <section title="Packet reordering considerations">
@@ -809,7 +828,7 @@ Placeholder
       space for each DetNet flow.</t>
      <t>
       DetNet service Label (S-label) that identifies a DetNet flow to the peer node that is to process it.
-      The S-Label is allocated from the platform label space.
+      The S-Label is allocated from the platform label space <xref target="RFC3031"/>.
 	  </t>
      <!-- t>
       An optional DetNet service label (S2-Label) that represents DetNet Service LSP used between
@@ -884,15 +903,19 @@ Placeholder
   </section>
   <section title="Flow Identification">   
    <t>
-    DetNet flow identification at a DetNet service layer is realized by an S-label. It maps a Detnet
-    flow to a specific d-CW in a DetNet node. For a data flow the S-label used for flow
-    identification MUST be bottom label of the label stack for a DetNet-s- or DetNet-st-flow and
+    DetNet flow identification at a DetNet service layer is realized by an S-label. 
+    The S-lable is allocated from the platform label label space <xref target="RFC3031"/>
+    Thich means that the DetNet flow is correctly identified and matched to the 
+    flow parameters, including the flow history, regardless of which input interface 
+    the packet arrives on.
+    The S-label MUST be at the bottom label of the label stack for a DetNet-s- or DetNet-st-flow and
     MUST precede the d-CW. 
    </t>
    <t>
-    An S-label for a single DetNet flow does not need to be unique DetNet domain wide. As long
-    as two or more different DetNet flows do not errorneously map to a same d-CW in a DetNet node
-    the labels may vary. 
+    The S-label for a specific DetNet flow is unique to that DetNet flow on a specific node, but
+    is not required to be identical with the S-lable for that DetNet flow in any other node
+    within the DetNet domain. Thus the S-label can only be used to identify the DetNet flow
+    at the intended receiving node.
    </t>
    <t>
     <list>
@@ -1814,6 +1837,7 @@ Client AC   |             |           |             |
    <?rfc include="reference.RFC.2212"?>
    <?rfc include="reference.RFC.2474"?>
    <?rfc include="reference.RFC.3168"?>
+   <?rfc include="reference.RFC.3031"?>
    <?rfc include="reference.RFC.3032"?>
    <?rfc include="reference.RFC.3209"?>
    <?rfc include="reference.RFC.3270"?>
