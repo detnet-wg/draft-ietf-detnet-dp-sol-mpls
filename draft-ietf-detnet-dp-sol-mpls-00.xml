@@ -26,6 +26,7 @@
 <!ENTITY rfc5462 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5462.xml">
 <!ENTITY rfc5586 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5586.xml">
 <!ENTITY rfc5659 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5659.xml">
+<!ENTITY rfc5085 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5085.xml">
 <!ENTITY rfc5921 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5921.xml">
 <!ENTITY rfc5960 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5960.xml">
 <!ENTITY rfc6073 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6073.xml">
@@ -881,7 +882,7 @@ Placeholder
 ]]>
     </artwork></figure>
   </section>
-  <section title="Flow identification">   
+  <section title="Flow Identification">   
    <t>
     DetNet flow identification at a DetNet service layer is realized by an S-label. It maps a Detnet
     flow to a specific d-CW in a DetNet node. For a data flow the S-label used for flow
@@ -903,7 +904,28 @@ Placeholder
     </list>
    </t>
   </section>
-  
+
+  <section anchor="oam-indication" title="OAM Indication">
+   <t>
+    OAM follows the procedures set out in <xref target="RFC5085"/> with the 
+    restriction that only Virtual Circuit Connectivity Verification
+    (VCCV) type 1 is supported.</t>
+
+   <t>Editor's Note - is this restriction acceptable? Do we need to
+      support GAL based OAM indication?</t>
+
+   <t>As shown in Figure 3 of <xref target="RFC5085"/> when the first nibble of
+    the d-CW is 0x0 the payload following the d-CW is normal user
+    data. However, when the first nibble of the d-CW is 0X1, the 
+    payload that follows the d-DW is an OAM payload with the OAM
+    type indicated by the value in the d-CW Channel Type field.</t>
+
+   <t>The reader is referred to <xref target="RFC5085"/> for a more detailed
+    description of the Associated Channel mechanism, and to the 
+    DetNet work on OAM for more information DetNet OAM.
+   </t>
+  </section>
+
    <section title="Service layer considerations">
    <t>
     [Editor's note: quite a bit of unfinished and old text in the following sections.]
@@ -1461,6 +1483,10 @@ Client AC   |             |           |             |
   </t>
 
  </section>
+
+<!-- ===================================================================== -->
+
+
 <!-- ===================================================================== -->
 
 <section title="Management and control considerations">
@@ -1670,6 +1696,7 @@ Client AC   |             |           |             |
    <?rfc include="reference.RFC.3473"?>
    <?rfc include="reference.RFC.4206"?>
    <?rfc include="reference.RFC.5129"?>
+   <?rfc include="reference.RFC.5085"?>
    <?rfc include="reference.RFC.5462"?>
    <?rfc include="reference.RFC.6003"?>
    &rfc6073;
