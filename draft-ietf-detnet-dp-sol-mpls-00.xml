@@ -179,13 +179,22 @@
         specific service function.
      </t>
 
-    <t hangText="PREF">
-     A Packet Replication and Elimination Function (PREF) does the replication
-     and elimination processing of DetNet flow packets in edge or relay
-     nodes. The replication function is essentially the existing 1+n protection
-     mechanism. The elimination function reuses and extends the existing duplicate 
-	 detection mechanism to operate over multiple (separate) DetNet member flows of a 
-	 DetNet compound flow.</t>
+    <t hangText="PEF">
+     A Packet Elimination Function (PEF) elimates duplicate copies of packets received
+     by an edge or a relay node to prevent excess packets flooding the network, or to
+     prevent duplicate packets being sent out of the DetNet domain.
+    </t>
+
+    <t hangText="PRF">
+     A Packet Replication Function (PRF) replicates DetNet flow packets in an edge or a relay
+     node and forwards them to one or more next hops in the DetNet domain. The number of packet copies sent 
+     to each next hop is a parameter of the DetNet flow at the node doing the replication.
+    </t>
+
+    <t hangText="PROF">
+     A Packet Reorder Function (PROF) re-orders packets within a DetNet flow  that are received out of order.
+     This function may be implemented at an edge or a relay node.
+    </t>
     
     <t hangText="DetNet Control Word">
 	  A control word used for sequencing and identifying duplicate packets at the DetNet service
@@ -213,6 +222,9 @@
     <t hangText="NSP">Native Service Processing.</t>
     <t hangText="OAM">Operations, Administration, and Maintenance.</t>
     <t hangText="PE">Provider Edge.</t>
+    <t hangText="PEF">Packet Elimination Function.</t>
+    <t hangText="PRF">Packet Replication Function.</t>
+    <t hangText="PROF">Packet Reorder Function.</t>
     <t hangText="PREF">Packet Replication and Elimination Function.</t>
     <t hangText="PSN">Packet Switched Network.</t>
     <t hangText="PW">PseudoWire.</t>
