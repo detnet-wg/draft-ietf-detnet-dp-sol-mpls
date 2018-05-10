@@ -120,7 +120,7 @@
  <section title="Introduction" anchor="sec_intro">
   <t>
     Deterministic Networking (DetNet) is a service that can be offered by a network to DetNet flows.
-    DetNet provides these flows extremely an low packet loss rates and assured maximum end-to-end
+    DetNet provides these flows extremely with an low packet loss rates and assured maximum end-to-end
     delivery latency.  General background and concepts of DetNet can be found in <xref
     target="I-D.ietf-detnet-architecture"/>.
   </t>
@@ -135,9 +135,9 @@
     is assumed to be in place in a DetNet node.
   </t>
   <t>
-   Furthermore, this document also describes how DetNet flows are identified, how a DetNet
-   Relay/Edge/Transit nodes work, and how the Packet Replication and Elimination function (PREF) is
-   implemented with the two data plane solutions.
+   Furthermore, this document also describes how DetNet flows are identified, and how a DetNet
+   Relay/Edge/Transit nodes works. It also describes the function and operation of the Packet Replication (PRF)
+   Packet Elimination (PEF) and Packet Reordering (PROF) functions in the MPLS data plane.
   </t>
   <t>
    This document does not define the associated control plane functions, or Operations,
@@ -165,27 +165,26 @@
     nodes that implment also the DetNet service layer functions. An S-Label is
     also used to identify a DetNet flow at DetNet service layer.</t>
 	
-    <t hangText="Local-ID">
+    <t hangText="PEF">
+     A Packet Elimination Function (PEF) elimates duplicate copies of packets received
+     by an edge or a relay node to prevent excess packets flooding the network, or to
+     prevent duplicate packets being sent out of the DetNet domain.
+    </t>
 
-        [Note to the editors this section is not needed. This is internal to the node. With
-        pseudowires we needed global identifier for the control plane to identfy the PW to
-        the node, and we used platform label space to ensure the PW was identiable when
-        it was received. I think this can be deleted - SB]
-     </t>
+    <t hangText="PRF">
+     A Packet Replication Function (PRF) replicates DetNet flow packets in an edge or a relay
+     node and forwards them to one or more next hops in the DetNet domain. The number of packet copies sent 
+     to each next hop is a parameter of the DetNet flow at the node doing the replication.
+    </t>
 
-     <t>
-        A DetNet Edge and Relay node internal construct that uniquely identifies a DetNet flow within a
-        node and never appear on-wire. It may be used to select proper forwarding and/or DetNet
-        specific service function.
-     </t>
+    <t hangText="PROEF">
+     Collective name for Packet Replication, Re-order and Elimination Functions.
+    </t>
 
-    <t hangText="PREF">
-     A Packet Replication and Elimination Function (PREF) does the replication
-     and elimination processing of DetNet flow packets in edge or relay
-     nodes. The replication function is essentially the existing 1+n protection
-     mechanism. The elimination function reuses and extends the existing duplicate 
-	 detection mechanism to operate over multiple (separate) DetNet member flows of a 
-	 DetNet compound flow.</t>
+    <t hangText="PROF">
+     A Packet Reorder Function (PROF) re-orders packets within a DetNet flow  that are received out of order.
+     This function may be implemented at an edge or a relay node.
+    </t>
     
     <t hangText="DetNet Control Word">
 	  A control word used for sequencing and identifying duplicate packets at the DetNet service
@@ -213,7 +212,10 @@
     <t hangText="NSP">Native Service Processing.</t>
     <t hangText="OAM">Operations, Administration, and Maintenance.</t>
     <t hangText="PE">Provider Edge.</t>
-    <t hangText="PREF">Packet Replication and Elimination Function.</t>
+    <t hangText="PEF">Packet Elimination Function.</t>
+    <t hangText="PRF">Packet Replication Function.</t>
+    <t hangText="PROEF">Packet Replication, Reodering and Elimination Functions.</t>
+    <t hangText="PROF">Packet Reorder Function.</t>
     <t hangText="PSN">Packet Switched Network.</t>
     <t hangText="PW">PseudoWire.</t>
     <t hangText="QoS">Quality of Service.</t>
@@ -461,39 +463,54 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
  </t>
  </section>
 
- <section title="Packet replication and elimination considerations">
+ <section title="Packet Replication and Elimination Considerations">
   <t>
-   DetNet service layer introduces packet replication and elimination functionality (PREF) for use
-   in DetNet edge and relay node and end system packet processing.  PREF MAY be enabled in a DetNet
-   node and the required processing is only applied to packets with  a positive flow identification
-   at the DetNet service layer. PREF utilizes a sequence number carried within a DetNet flow
-   packets.
+   DetNet service layer introduces packet replication (PRF) and packet elimination functionality (PEF) for use
+   in DetNet edge and relay node and end system packet processing.  Either or both of these functions MAY 
+   be enabled in a DetNet
+   node. The required processing is applied to packets that are identified by the S-Label
+   as requiring one or both of these functions to be applied. Ingress packets may be identified as
+   requiring replication as part of the input processing mechanism that applies the encapsulation
+   to the packet. The 
+   PRF and PEF utilizes a sequence number that is carried within the DetNet flow packet.
   </t>
   <t>
-   At a DetNet node level the output of the PREF elimination function is always a single packet.
-   The output of the PREF replication function at a DetNet node level is always one or more packets
-   (i.e., 1:M replication). The replicated packets MUST share the same d-CW i.e., the sequence
-   number is the same for each member flow of the compound flow. The location and mechanism on the
-   packet processing pipeline used for replication is implementation specific.
+   The order in which a node applies the PEF and the PRF to a DetNet flow is implimentation 
+   specific.
   </t>
   <t>
-   The complex part of the DetNet PREF processing is tracking the history of received packets for
-   multiple DetNet member flows. These ingress DetNet member flows (to a node) MUST have the same
-   local-ID if they belong to the same DetNet (compound) flow and share the same sequence number
-   counter and the history information. The location of the packet elimination on the packet
-   processing pipeline is implementation specific.
+   The output of the PRF is always one or more packets
+   (i.e., 1:M replication). Packets output from the PRF MUST include the same d-CW as the 
+   as the input packet. This ensures that the sequence
+   number is the same for each member flow of the compound flow. 
+   The location within a node, and the mechanism used for the PRF is implementation specific.
   </t>
   <t>
-   [Note to editor - Clean up local-id when dealing with PREF text] 
+   The output of the PEF is always a single packet.
+   A DetNet PEF must track the history of received packets for each 
+   DetNet flow that it is configured to process. Packet for a particular DetNet flow 
+   to be processed by the PEF MUST share the same S-Label, sequence number counter 
+   and history information. The location within a node, and mechanism used for the 
+   PEF is implementation specific.
   </t>
- </section>
+  </section>
  <section title="Packet reordering considerations">
   <t>     
-   DetNet service layer introduces also packet reordering functionality for use in DetNet edge and
-   relay node and end system packet processing. The reordering functionality MAY be enabled in a
-   DetNet node. The reordeing functionality relies on a presence of sequence numbers in a DetNet
-   (compound) flows. The reordering processing is only applied to packets with  a positive flow
-   identification at the DetNet service layer.
+   DetNet service layer introduces packet reordering functionality (PROF) for use in DetNet edge and
+   relay node and end system packet processing. The PROF MAY be enabled in a
+   DetNet node. The PROF relies on the  presence of sequence numbers in a DetNet
+   (compound) flows. The PROF is only applied to DetNet flows that are identified
+   by the S-Label as requiring this function. 
+  </t>
+  <t>
+   Editors note: I cannot remember what we concluded about the following. We can remove
+   it is a future version if we decide it is too complicated or not needed.
+  </t>
+  <t>
+   A DetNet Flow MAY use the sequence number as a proxy for a timestamp. In such cases
+   packets that are delayed by more than the time specified for that DetNet flow
+   are discarded. Detailed technical considerations of this processing are for 
+   further study.
   </t>
  </section>
 </section>  <!-- end of data plane overview -->
@@ -539,8 +556,8 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
   </t>
 
   <t>
-   As a general rule, DetNet domains MUST be capable to forward any Data-flows
-   and the DetNet domain MUST NOT intend to mandate end-system encapsulation
+   As a general rule, DetNet domains MUST be capable of forwarding any Data-flows
+   and the DetNet domain MUST NOT mandate the end-system encapsulation
    format. 
   </t>
 
@@ -582,7 +599,7 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
 
  <section title="DetNet domain specific considerations">
 
-  <t> From connection type perspective three scenarios are distinguished:
+  <t> From a connection type perspective, three scenarios are distinguished:
     <list style="numbers">
 	<t> Directly attached: end-system is directly connected to an edge node </t>
 	<t> Indirectly attached: end-system is behind a (L2-TSN / L3-DetNet) sub-net  </t>
@@ -917,15 +934,6 @@ Placeholder
     within the DetNet domain. Thus the S-label can only be used to identify the DetNet flow
     at the intended receiving node.
    </t>
-   <t>
-    <list>
-     <t>
-      [Editor's note: We have specified the above for _data_ to leave the door open for the GAL
-      based OAM method as an alternative to the ACH mechanism currently specified.  When using GAL
-      the GAL label would be after the S-Label.  Do we leave this option in or shut the door on it?]
-     </t>
-    </list>
-   </t>
   </section>
 
   <section anchor="oam-indication" title="OAM Indication">
@@ -933,9 +941,6 @@ Placeholder
     OAM follows the procedures set out in <xref target="RFC5085"/> with the 
     restriction that only Virtual Circuit Connectivity Verification
     (VCCV) type 1 is supported.</t>
-
-   <t>Editor's Note - is this restriction acceptable? Do we need to
-      support GAL based OAM indication?</t>
 
    <t>As shown in Figure 3 of <xref target="RFC5085"/> when the first nibble of
     the d-CW is 0x0 the payload following the d-CW is normal user
@@ -951,13 +956,6 @@ Placeholder
 
   <section anchor="FAG" title="Flow Aggregation">
    <t>
-    The ability to aggregate individual flows, and their associated
-    resource control, into a larger aggregate is an important technique
-    for improving scaling of control in the data, management and control
-    planes.  The DetNet data plane allows for the aggregation of DetNet flows,
-    to improved scaling. There are three methods of introducing flow aggregation:
-   </t>
-   <t>
     <list style="numbers">
      <t>Aggregate at the LSP (Transport)</t>
      <t>Aggregating DetNet flows as a new DetNet flow</t>
@@ -972,36 +970,70 @@ Placeholder
     management aspects of aggregation (including the queuing/shaping/
     policing implications) will be covered in other documents.
    </t>
-  </section>
-  <section anchor="aggregation-at-the-lsp" title="Aggregation at the LSP">
    <t>
-    DetNet flows transported via MPLS can leverage MPLS-TE?s existing
-    support for hierarchical LSPs (H-LSPs), see <xref target="RFC4206"/>.  H-LSPs are
-    typically used to aggregate control and resources, they may also be
-    used to provide OAM or protection for the aggregated LSPs.  Arbitrary
-    levels of aggregation naturally falls out of the definition for
-    hierarchy and the MPLS label stack <xref target="RFC3032"/>.  DetNet nodes which
-    support aggregation (LSP hierarchy) map one or more LSPs (labels)
-    into and from an H-LSP.  Both carried LSPs and H-LSPs may or may not
-    use the TC field, i.e., L-LSPs or E-LSPs.  Such nodes will need to
-    ensure that traffic from aggregated LSPs are placed (shaped/policed/
-    enqueued) onto the H-LSPs in a fashion that ensures the required
-    DetNet service is preserved.
+    The ability to aggregate individual flows, and their associated
+    resource control, into a larger aggregate is an important technique
+    for improving scaling of control in the data, management and control
+    planes.  The DetNet data plane allows for the aggregation of DetNet flows,
+    to improved scaling. There are three methods of introducing flow aggregation:
+   </t>
+   <t> 
+    The following review comments were received when this section
+    was committed to github.
    </t>
    <t>
-    Additional details of the traffic
-    control capabilities needed at a DetNet-aware node may be covered in
-    the new service descriptions mentioned above or in separate future
-    documents.  Management and control plane mechanisms will also need to
-    ensure that the service required on the aggregate flow (H-LSP or
-    DSCP) are provided, which may include the discarding or remarking
-    mentioned in the previous sections.
+    General comment: We should points to the major issue of aggregation, 
+    namely the Seq.Num related problem. The aggregated flows have their 
+    own Seq.Num and those are independent. We should consider to 
+    group the aggregation techniques as per their impact on what DetNet 
+    functions they allow on a DetNet flow. (E.g., aggregation without 
+    new Aggregate.Seq.Num would prohibit usage of FR, EF and IoD 
+    function on the aggregate flow).
    </t>
-  </section>
-  <section anchor="aggregating-detnet-flows-as-a-new-detnet-flow" title="Aggregating DetNet flows as a new DetNet flow">
    <t>
-    An aggregate can be built by layering DetNet flows as shown below:
+    SR based aggregation can be treated as a form of H-LSP aggregation. 
+    Should we differentiate them? What are the differences?
    </t>
+   <t>
+    What are the issues when aggregating of different payload types? Should we 
+    add an editor note on this?
+   </t>
+   <t>
+    Simple-aggregation-at-the-detnet-layer: is this not the same as H-LSP? 
+    The A-label can be treated just as an additional T-label.
+   </t>
+   <t>
+    End of review comment.
+   </t>
+   <section anchor="aggregation-at-the-lsp" title="Aggregation at the LSP">
+    <t>
+     DetNet flows transported via MPLS can leverage MPLS-TE?s existing
+     support for hierarchical LSPs (H-LSPs), see <xref target="RFC4206"/>.  H-LSPs are
+     typically used to aggregate control and resources, they may also be
+     used to provide OAM or protection for the aggregated LSPs.  Arbitrary
+     levels of aggregation naturally falls out of the definition for
+     hierarchy and the MPLS label stack <xref target="RFC3032"/>.  DetNet nodes which
+     support aggregation (LSP hierarchy) map one or more LSPs (labels)
+     into and from an H-LSP.  Both carried LSPs and H-LSPs may or may not
+     use the TC field, i.e., L-LSPs or E-LSPs.  Such nodes will need to
+     ensure that traffic from aggregated LSPs are placed (shaped/policed/
+     enqueued) onto the H-LSPs in a fashion that ensures the required
+     DetNet service is preserved.
+    </t>
+    <t>
+     Additional details of the traffic
+     control capabilities needed at a DetNet-aware node may be covered in
+     the new service descriptions mentioned above or in separate future
+     documents.  Management and control plane mechanisms will also need to
+     ensure that the service required on the aggregate flow (H-LSP or
+     DSCP) are provided, which may include the discarding or remarking
+     mentioned in the previous sections.
+    </t>
+    </section>
+    <section anchor="aggregating-detnet-flows-as-a-new-detnet-flow" title="Aggregating DetNet flows as a new DetNet flow">
+    <t>
+     An aggregate can be built by layering DetNet flows as shown below:
+    </t>
 
 <figure><artwork><![CDATA[
 +---------------------------------+
@@ -1026,31 +1058,31 @@ Placeholder
 +---------------------------------+
 ]]></artwork></figure>
 
-   <t>
-    Both the Aggregation (A) label and the S-label have their MPLS S bit
-    set indicating bottom of stack, and the d-CW allows the PREF functions 
-    to work.
-   </t>
-   <t>
-    It is a property of the A-label that what follows is d-CW followed
-    by an S-label. A relay node processing the A-label would not know
-    the underlying payload type. This would only be known to a node
-    that was a peer of the node imposing the S-label. However there
-    is no real need for it to know the payload type during aggregation processing.
-   </t>
-  </section>
+    <t>
+     Both the Aggregation (A) label and the S-label have their MPLS S bit
+     set indicating bottom of stack, and the d-CW allows the PROEF
+     to work.
+    </t>
+    <t>
+     It is a property of the A-label that what follows is d-CW followed
+     by an S-label. A relay node processing the A-label would not know
+     the underlying payload type. This would only be known to a node
+     that was a peer of the node imposing the S-label. However there
+     is no real need for it to know the payload type during aggregation processing.
+    </t>
+   </section>
 
- <section anchor="simple-aggregation-at-the-detnet-layer" title="Simple Aggregation at the DetNet layer">
-  <t>
-   Another approach would be not to include a d-CW for the aggregated flow.
-   This would be functionally similar to aggregation at the transport layer
-   using H-LSPs, but would confine knowledge of the aggregation to the 
-   DetNet layer. Such an approach shares the disadvantage that PREF 
-   operations would not be possible. OAM operation in this mode is 
-   for further study.
-  </t>
+   <section anchor="simple-aggregation-at-the-detnet-layer" title="Simple Aggregation at the DetNet layer">
+    <t>
+    Another approach would be not to include a d-CW for the aggregated flow.
+    This would be functionally similar to aggregation at the transport layer
+    using H-LSPs, but would confine knowledge of the aggregation to the 
+    DetNet layer. Such an approach shares the disadvantage that PROEF
+    operations would not be possible. OAM operation in this mode is 
+    for further study.
+   </t>
 
-<figure><artwork><![CDATA[
+   <figure><artwork><![CDATA[
  +---------------------------------+
  |                                 |
  |           DetNet Flow           |
@@ -1071,15 +1103,15 @@ Placeholder
  +---------------------------------+
 ]]></artwork></figure>
 
+  </section>
  </section>
-
 
  <section title="Service layer considerations">
    <t>
     [Editor's note: quite a bit of unfinished and old text in the following sections.]
    </t>
    <t>
-     The edge and relay node internal procedures of the PREF are implementation specific.  The order
+     The edge and relay node internal procedures of the PROEF are implementation specific.  The order
      of a packet elimination or replication is out of scope in this specification. However, care
      should be taken that the replication function does not actually loopback packets as "replicas".
      Looped back packets include artificial delay when the node that originally initiated the packet
@@ -1156,7 +1188,7 @@ Client AC   |             |           |             |
 	   </t>
 	   <t hangText="Discussion:">
 		   When it comes to use of NSPs, agree. Also for "island interconnect" this is
-		   a fine. However, when there is a need to do PREF in a middle, plain edge to edge
+		   a fine. However, when there is a need to do PROEF in a middle, plain edge to edge
 		   is not enough.
   	 </t>
 	</list>
@@ -1196,15 +1228,15 @@ Client AC   |             |           |             |
      elimination. This processing is done within an extended forwarder function.
      Whether an ingress DetNet member flow receives DetNet specific processing depends on how
      the forwarding is programmed.  For some DetNet member flows the relay node can act as a normal relay node
-     and for some apply the DetNet specific processing (i.e., PREF).
+     and for some apply the DetNet specific processing (i.e., PROEF).
     <list style="hanging">
 	   <t hangText="Comment #7">
            SB> Again relay node is not a normal term, so am not sure what it does
-            in the absence of a PREF function.
+            in the absence of a PROEF function.
            </t>
 	   <t hangText="Discussion:">
 		   Relay node was a DetNet aware S-PE originally, which is not explicitly stated here anymore, thus
-                   slightly confusing text here. The text here needs to clarify the roles of PREF and switching
+                   slightly confusing text here. The text here needs to clarify the roles of PROEF and switching
 		   functions. A DetNet relay is described in the architecture document. However, there is definitely
 		   room for termonilogy and text improvements.
   	 </t>
@@ -1495,9 +1527,9 @@ Client AC   |             |           |             |
 
  <!-- section title="Packet replication and elimination function">
      <t>
-         [editor's note: collect details of the PREF here. Potential topics to discuss relate to
+         [editor's note: collect details of the PROEF here. Potential topics to discuss relate to
          constraints to input packets and what the expected output is. Some examples include: the
-         input packets must have the same PW Label (in a case of PWs) to enable the PREF, no
+         input packets must have the same PW Label (in a case of PWs) to enable the PROEF, no
          loopback for replicated packets, input and output PW labels do not need to be the same.
          Also, add text regarding native IPv6 encapsulation. There the PW label is replaced with
          source address + flow label combination, and the Control Word is replaced with the DetNet
@@ -1655,7 +1687,7 @@ Client AC   |             |           |             |
   <t>
    [Editor's note: This section is a work in progress.
    discuss here what kind of enhancements are needed for DetNet
-   and specifically for PREF and DetNet zero congest loss and latency
+   and specifically for PROEF and DetNet zero congest loss and latency
    control. Need to cover both traffic control (queuing) and connection
    control (control plane).]
  </t>
@@ -1706,7 +1738,7 @@ Client AC   |             |           |             |
    [Editor's note: Outdated and at the functional level technology independent.. but needs more work.]		 
   </t>
   <t>
-   The control plane protocol solution required for managing the PREF processing
+   The control plane protocol solution required for managing the PROEF processing
    is outside the scope of this document.
   </t>
  </section>
@@ -1918,7 +1950,7 @@ Client AC   |             |           |             |
  <section title="Example of DetNet data plane operation" anchor="sec_comb">
   <t>
    [Editor's note: Add a simplified example of DetNet data plane and how labels etc
-   work in the case of MPLS-based PSN and utilizing PREF. The figure is subject
+   work in the case of MPLS-based PSN and utilizing PROEF. The figure is subject
    to change depending on the further DT decisions on the label handling..]
   </t>
  </section>
