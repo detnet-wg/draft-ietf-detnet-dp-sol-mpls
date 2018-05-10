@@ -934,15 +934,6 @@ Placeholder
     within the DetNet domain. Thus the S-label can only be used to identify the DetNet flow
     at the intended receiving node.
    </t>
-   <t>
-    <list>
-     <t>
-      [Editor's note: We have specified the above for _data_ to leave the door open for the GAL
-      based OAM method as an alternative to the ACH mechanism currently specified.  When using GAL
-      the GAL label would be after the S-Label.  Do we leave this option in or shut the door on it?]
-     </t>
-    </list>
-   </t>
   </section>
 
   <section anchor="oam-indication" title="OAM Indication">
@@ -950,9 +941,6 @@ Placeholder
     OAM follows the procedures set out in <xref target="RFC5085"/> with the 
     restriction that only Virtual Circuit Connectivity Verification
     (VCCV) type 1 is supported.</t>
-
-   <t>Editor's Note - is this restriction acceptable? Do we need to
-      support GAL based OAM indication?</t>
 
    <t>As shown in Figure 3 of <xref target="RFC5085"/> when the first nibble of
     the d-CW is 0x0 the payload following the d-CW is normal user
