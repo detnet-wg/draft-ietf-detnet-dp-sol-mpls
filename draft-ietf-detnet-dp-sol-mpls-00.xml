@@ -120,7 +120,7 @@
  <section title="Introduction" anchor="sec_intro">
   <t>
     Deterministic Networking (DetNet) is a service that can be offered by a network to DetNet flows.
-    DetNet provides these flows extremely an low packet loss rates and assured maximum end-to-end
+    DetNet provides these flows extremely with an low packet loss rates and assured maximum end-to-end
     delivery latency.  General background and concepts of DetNet can be found in <xref
     target="I-D.ietf-detnet-architecture"/>.
   </t>
@@ -556,8 +556,8 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
   </t>
 
   <t>
-   As a general rule, DetNet domains MUST be capable to forward any Data-flows
-   and the DetNet domain MUST NOT intend to mandate end-system encapsulation
+   As a general rule, DetNet domains MUST be capable of forwarding any Data-flows
+   and the DetNet domain MUST NOT mandate the end-system encapsulation
    format. 
   </t>
 
@@ -599,7 +599,7 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
 
  <section title="DetNet domain specific considerations">
 
-  <t> From connection type perspective three scenarios are distinguished:
+  <t> From a connection type perspective, three scenarios are distinguished:
     <list style="numbers">
 	<t> Directly attached: end-system is directly connected to an edge node </t>
 	<t> Indirectly attached: end-system is behind a (L2-TSN / L3-DetNet) sub-net  </t>
