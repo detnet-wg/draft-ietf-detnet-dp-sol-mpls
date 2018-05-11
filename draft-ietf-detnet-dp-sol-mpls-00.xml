@@ -634,17 +634,18 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
     </artwork></figure>
   
 
- <section title="DetNet Bridging Service">
+ <section title="DetNet Layer Two Service">
   
   <t>
-   The simplest DetNet service is to provide bridging (i.e., tunneling for L2),
+   The simplest DetNet service is to provide tunneling for layer two,
    where the connected hosts are in the same broadcast (BC) domain. Forwarding
-   over the DetNet domain is based on L2 (MAC) addresses (i.e. dst-MAC), so L2
-   headers MUST be kept. For both IP and MPLS PSN a DetNet specific tunnel
-   encapsulation MUST be introduced. 
+   over the DetNet domain is based on L2 (MAC) addresses (i.e. dst-MAC),
+   or on received interface <xref target="RFC3985"/>. In both cases
+   the L2 headers MUST either be kept, or provision must be made for their
+   reconstruction at egress from the DetNet domain.
   </t>
 
-  <figure title="Encapsulation format for DetNet Bridging" anchor="fig_encap_DN_bridging">
+  <figure title="Encapsulation format for DetNet Layer Two Service" anchor="fig_encap_DN_bridging">
   <artwork align="center"><![CDATA[
                      +------+
                      |  X   |
@@ -652,43 +653,48 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
             |  X   | |  IP  |
             +------+ +------+
 End+system  |  L2  | |  L2  |
-      +-----+======+-+======+--+======+-+======++
-DetNet tunnel                  |  IP  | | MPLS |
-                               +------+ +------+
-                               |  L2  | |  L2  |
-                               +------+ +------+
+      +-----+======+-+======+--+------+
+DetNet tunnel                  | Shim |
+                               +------+ 
+                               | MPLS |
+                               +------+
+                               |  L2  |
+                               +------+
 
 Examples
 
-                               +------+ +------+
-                               |  X   | |  X   |
-            +------+ +------+  +------+ +------+
-            |  X   | |  X   |  |  IP  | |  IP  |
-            +------+ +------+  +------+ +------+
-            |  L2  | |  L2  |  |  L2  | |  L2  |
-           ++======+-+======+--+======+-+======++
-            |  IP  | | MPLS |  |  IP  | | MPLS |
-            +------+ +------+  +------+ +------+
-            |  L2  | |  L2  |  |  L2  | |  L2  |
-            +------+ +------+  +------+ +------+
+                      +------+  +------+
+                      |  X   |  |  X   |
+            +------+  +------+  +------+
+            |  X   |  |  IP  |  |  IP  | 
+            +------+  +------+  +------+
+            |  L2  |  |  L2  |  |  L2  |
+            +======+--+======+--+======+
+            | d-CW |  | d-CW |  | d-CW |
+            +------+  +------+  +------+
+            | MPLS |  | MPLS |  | MPLS |
+            +------+  +------+  +------+
+            |  L2  |  |  L2  |  | UDP  |  
+            +------+  +------+  +------+
+                                |  IP  |
+                                +------+
+                                |  L2  |
+                                +------+
   ]]>
     </artwork></figure>
   
   <t>
-   As shown on the figure both L2 and L3 end-systems can be served by such a DetNet Bridging service.   
+   As shown on the figure both L2 and L3 end-systems can be served by such a DetNet layer two encapsulation service.
+   This encapsulation service may be carried over MPLS natively  <xref target="pwSolution"/>, of over MPLS over IP
+   <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>   
   </t>
   </section>
 
  <section title="DetNet Routing Service" anchor="detrouting">
 
   <t> 
-   DetNet Routing service provides routing, therefore available only for L3
-   hosts that are in different BC domains. Forwarding over the DetNet domain is
-   based on L3 (IP) addresses (i.e. dst-IP).
-  </t>
-
-  <section title="MPLS PSN">
-  <t> 
+   DetNet Routing service provides routing. Forwarding over the DetNet domain is
+   based on L3 (IP) addresses (i.e. dst-IP). 
    In case of an MPLS PSN at the ingress/egress (i.e., PE nodes of DetNet
    domain) the IP packets are encapsulated in MPLS. The data-flow IP header MUST
    be preserved as-is. 
@@ -696,20 +702,41 @@ Examples
 
   <figure title="Encapsulation format for DetNet Routing in MPLS PSN for L3 end-systems" anchor="fig_mpls_DN_routing">
   <artwork align="center"><![CDATA[
-           +------+                         +------+
-           |  X   |                         |  X   |
-           +------+                         +------+
-End+system |  IP  |                         |  IP  |
-      -----+------+-------+======+---     --+======+--
-DetNet                    | MPLS |          | MPLS |
-                          +------+          +------+
-                          |  L2  |          |  L2  |
-                          +------+          +------+
+            
+            
+            +------+
+            |  X   |
+            +------+
+End+system  |  IP  |
+      +-----+======+--+------+
+DetNet tunnel         | Shim |
+                      +------+ 
+                      | MPLS |
+                      +------+
+                      |  L2  |
+                      +------+
+
+Examples
+
+            +------+  +------+
+            |  X   |  |  X   |
+            +------+  +------+
+            |  IP  |  |  IP  | 
+            +======+--+======+
+            | d-CW |  | d-CW |
+            +------+  +------+
+            | MPLS |  | MPLS |
+            +------+  +------+
+            |  L2  |  | UDP  |  
+            +------+  +------+
+                      |  IP  |
+                      +------+
+                      |  L2  |
+                      +------+
   ]]>
-    </artwork></figure>
-  
-  </section>
- </section> <!-- -->
+  </artwork></figure>
+ 
+ </section>
 </section>
 
   
