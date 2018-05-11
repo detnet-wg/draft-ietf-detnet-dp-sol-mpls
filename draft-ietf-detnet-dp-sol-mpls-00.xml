@@ -936,6 +936,41 @@ Placeholder
     at the intended receiving node.
    </t>
   </section>
+ 
+  <section title="Indication of the DetNet Payload Type" anchor="PTI-section">
+   <t>
+    The only nodes that needs to know the payload type of a flow are the
+    DetNet ingress node and the DetNet egress nodes.
+    The ingress node has to know how to process the packet it receives
+    from the ingress AC, and egress edge node has to know how to
+    prepare the packet for transmission on the egress AC.
+   </t>
+   <t>
+    On ingress a DetNet edge node has to classify the packets into those
+    that are for transmission as Detnet packets and those that are for
+    transmission as "normal" packets at one of more lower priorities.
+    The packet type is indicated to the egress edge node through the
+    value of the S-label.  Thus, when the egress edge node looks up the
+    S-label one of the parameters returned is the packet type which in
+    turn tells the egress edge node how to prepare the packet for
+    transmission over the egress AC.
+   </t>
+   <t>
+    The consequence of this approach is that if multiple packet encapsulations
+    are processed on a node, each will need its own S-Label. That is not
+    generally a problems, since it is anticipated that only one encapsulation 
+    type intented for carriage as a DetNet flow will be present on any egress.
+    However, IPv4 and IPv6 have different forwarding equivalence classes (FEC)
+    in MPLS and are therefore allocated different labels rather than being distinguished
+    through the IP version field in the IP header. Futhermore IPv4 and IPv6
+    when running directly over Ethernet are identified via the Ethertype rather 
+    than via the IP version number. Whilst it ought to be safe to identify 
+    the IP type though the IP version number the absence this approach in
+    practical applications suggests that it is more conservative to distinguish
+    between IP types through the S-Label. Thus when the payload is IP, two
+    S-Labels are used, one to identify an IPv4 payload and one to identify an IPv6 payload.
+   </t>
+  </section>
 
   <section anchor="oam-indication" title="OAM Indication">
    <t>
@@ -1110,6 +1145,10 @@ Placeholder
  <section title="Service layer considerations">
    <t>
     [Editor's note: quite a bit of unfinished and old text in the following sections.]
+   </t>
+   <t></t>
+   <t>
+    [Editor's note: when this section is re-written a reference to <xref target="PTI-section"/> should be included]
    </t>
    <t>
      The edge and relay node internal procedures of the PROEF are implementation specific.  The order
