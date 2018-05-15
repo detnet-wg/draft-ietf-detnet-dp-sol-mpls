@@ -50,6 +50,7 @@
 <!ENTITY rfc7510 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7510.xml">
 
 <!ENTITY I-D.ietf-detnet-dp-alt PUBLIC "" "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-detnet-dp-alt.xml">
+<!ENTITY I-D.ietf-spring-segment-routing-mpls PUBLIC "" "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-spring-segment-routing-mpls">
 <!ENTITY I-D.ietf-detnet-problem-statement PUBLIC "" "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-detnet-problem-statement.xml">
 <!ENTITY I-D.ietf-detnet-architecture PUBLIC "" "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-detnet-architecture.xml">
 <!ENTITY I-D.ietf-mpls-residence-time SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-mpls-residence-time">
@@ -633,17 +634,18 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
     </artwork></figure>
   
 
- <section title="DetNet Bridging Service">
+ <section title="DetNet Layer Two Service">
   
   <t>
-   The simplest DetNet service is to provide bridging (i.e., tunneling for L2),
+   The simplest DetNet service is to provide tunneling for layer two,
    where the connected hosts are in the same broadcast (BC) domain. Forwarding
-   over the DetNet domain is based on L2 (MAC) addresses (i.e. dst-MAC), so L2
-   headers MUST be kept. For both IP and MPLS PSN a DetNet specific tunnel
-   encapsulation MUST be introduced. 
+   over the DetNet domain is based on L2 (MAC) addresses (i.e. dst-MAC),
+   or on received interface <xref target="RFC3985"/>. In both cases
+   the L2 headers MUST either be kept, or provision must be made for their
+   reconstruction at egress from the DetNet domain.
   </t>
 
-  <figure title="Encapsulation format for DetNet Bridging" anchor="fig_encap_DN_bridging">
+  <figure title="Encapsulation format for DetNet Layer Two Service" anchor="fig_encap_DN_bridging">
   <artwork align="center"><![CDATA[
                      +------+
                      |  X   |
@@ -651,43 +653,48 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
             |  X   | |  IP  |
             +------+ +------+
 End+system  |  L2  | |  L2  |
-      +-----+======+-+======+--+======+-+======++
-DetNet tunnel                  |  IP  | | MPLS |
-                               +------+ +------+
-                               |  L2  | |  L2  |
-                               +------+ +------+
+      +-----+======+-+======+--+------+
+DetNet tunnel                  | Shim |
+                               +------+ 
+                               | MPLS |
+                               +------+
+                               |  L2  |
+                               +------+
 
 Examples
 
-                               +------+ +------+
-                               |  X   | |  X   |
-            +------+ +------+  +------+ +------+
-            |  X   | |  X   |  |  IP  | |  IP  |
-            +------+ +------+  +------+ +------+
-            |  L2  | |  L2  |  |  L2  | |  L2  |
-           ++======+-+======+--+======+-+======++
-            |  IP  | | MPLS |  |  IP  | | MPLS |
-            +------+ +------+  +------+ +------+
-            |  L2  | |  L2  |  |  L2  | |  L2  |
-            +------+ +------+  +------+ +------+
+                      +------+  +------+
+                      |  X   |  |  X   |
+            +------+  +------+  +------+
+            |  X   |  |  IP  |  |  IP  | 
+            +------+  +------+  +------+
+            |  L2  |  |  L2  |  |  L2  |
+            +======+--+======+--+======+
+            | d-CW |  | d-CW |  | d-CW |
+            +------+  +------+  +------+
+            | MPLS |  | MPLS |  | MPLS |
+            +------+  +------+  +------+
+            |  L2  |  |  L2  |  | UDP  |  
+            +------+  +------+  +------+
+                                |  IP  |
+                                +------+
+                                |  L2  |
+                                +------+
   ]]>
     </artwork></figure>
   
   <t>
-   As shown on the figure both L2 and L3 end-systems can be served by such a DetNet Bridging service.   
+   As shown on the figure both L2 and L3 end-systems can be served by such a DetNet layer two encapsulation service.
+   This encapsulation service may be carried over MPLS natively  <xref target="pwSolution"/>, of over MPLS over IP
+   <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>   
   </t>
   </section>
 
  <section title="DetNet Routing Service" anchor="detrouting">
 
   <t> 
-   DetNet Routing service provides routing, therefore available only for L3
-   hosts that are in different BC domains. Forwarding over the DetNet domain is
-   based on L3 (IP) addresses (i.e. dst-IP).
-  </t>
-
-  <section title="MPLS PSN">
-  <t> 
+   DetNet Routing service provides routing. Forwarding over the DetNet domain is
+   based on L3 (IP) addresses (i.e. dst-IP). 
    In case of an MPLS PSN at the ingress/egress (i.e., PE nodes of DetNet
    domain) the IP packets are encapsulated in MPLS. The data-flow IP header MUST
    be preserved as-is. 
@@ -695,20 +702,41 @@ Examples
 
   <figure title="Encapsulation format for DetNet Routing in MPLS PSN for L3 end-systems" anchor="fig_mpls_DN_routing">
   <artwork align="center"><![CDATA[
-           +------+                         +------+
-           |  X   |                         |  X   |
-           +------+                         +------+
-End+system |  IP  |                         |  IP  |
-      -----+------+-------+======+---     --+======+--
-DetNet                    | MPLS |          | MPLS |
-                          +------+          +------+
-                          |  L2  |          |  L2  |
-                          +------+          +------+
+            
+            
+            +------+
+            |  X   |
+            +------+
+End+system  |  IP  |
+      +-----+======+--+------+
+DetNet tunnel         | Shim |
+                      +------+ 
+                      | MPLS |
+                      +------+
+                      |  L2  |
+                      +------+
+
+Examples
+
+            +------+  +------+
+            |  X   |  |  X   |
+            +------+  +------+
+            |  IP  |  |  IP  | 
+            +======+--+======+
+            | d-CW |  | d-CW |
+            +------+  +------+
+            | MPLS |  | MPLS |
+            +------+  +------+
+            |  L2  |  | UDP  |  
+            +------+  +------+
+                      |  IP  |
+                      +------+
+                      |  L2  |
+                      +------+
   ]]>
-    </artwork></figure>
-  
-  </section>
- </section> <!-- -->
+  </artwork></figure>
+ 
+ </section>
 </section>
 
   
@@ -797,7 +825,7 @@ Placeholder
 
 <section title="MPLS-based DetNet data plane solution" anchor="dn-dt-solution">
 
- <section title="DetNet over MPLS Encapsulation Components">
+ <section title="DetNet over MPLS Encapsulation Components" anchor="dn-MPLS-en-comps">
   <!-- imported text from draft-bryant-detnet-mpls-dp-00.txt section "DetNet over MPLS Encapsulation
   Components" -->
   <t>
@@ -1110,6 +1138,10 @@ Placeholder
    <t>
     [Editor's note: quite a bit of unfinished and old text in the following sections.]
    </t>
+   <t></t>
+   <t>
+    [Editor's note: when this section is re-written a reference to <xref target="PTI-section"/> should be included]
+   </t>
    <t>
      The edge and relay node internal procedures of the PROEF are implementation specific.  The order
      of a packet elimination or replication is out of scope in this specification. However, care
@@ -1321,7 +1353,117 @@ Client AC   |             |           |             |
     </section>
    </section>
  </section>
-  
+
+
+<section anchor="detnet-data-plane-encapsulation-for-ip-transport-networks" title="DetNet Data Plane Encapsulation for IP Transport Networks">
+ <t>
+  This section specifies the DetNet encapsulation over an IP transport network.
+  The approach is modeled on the operation of MPLS and PseudoWires (PW) over
+  an IP Packet Switched Network (PSN) <xref target="RFC3985"/><xref target="RFC4385"/><xref target="RFC7510"/>. 
+  It is also based on the MPLS data plane encapsulation described in <xref target="pwSolution"/>. 
+ </t>
+ <t>
+  To carry DetNet with full functionality at the DetNet layer over an IP transport network, the 
+  following components are required (these are a subset of the requirements for MPLS encapsulation 
+  listed in <xref target="dn-MPLS-en-comps"/>):
+  </t>
+  <t>
+   <list style="numbers">
+    <t>A method of identifying the DetNet flow group to the processing element.</t>
+    <t>A method of carrying the DetNet sequence number.</t>
+    <t>A method of distinguishing DetNet OAM packets from DetNet data packets.</t>
+    <t>A method of carrying queuing and forwarding indication.</t>
+   </list>
+  </t>
+ <t>
+  These requirements are satisfied by the DetNet over MPLS Encapsulation 
+  described in <xref target="pwSolution"/>. 
+ </t>
+ <t>
+  To simplify operations and implementations, rather than inventing a brand new 
+  encapsulation, the IP encapsulation takes advantage of the MPLS encapsulation. 
+  By using the specification of MPLS over UDP and IP in <xref target="RFC7510"/>, 
+  the T-Label(s) shown in <xref target="fig_pw_mpls"/> in <xref target="pwSolution"/> 
+  can be replaced by UDP and IP, resulting in the following encapsulation:
+ </t>
+
+ <figure title="IP Encapsulation of DetNet" anchor="IP-encap-dn">
+ <artwork align="center"><![CDATA[
++---------------------------------+
+|                                 |
+|           DetNet Flow           |
+|         Payload  Packet         |
+|                                 |
++---------------------------------+ <--\
+|       DetNet Control Word       |    |
++---------------------------------+    +--> DetNet data plane
+|             S-Label             |    |    MPLS encapsulation
++---------------------------------+ <--/
+|           UDP Header            |
++---------------------------------+
+|           IP Header             |
++---------------------------------+
+|           Data-Link             |
++---------------------------------+
+|           Physical              |
++---------------------------------+
+]]>
+ </artwork></figure>
+ <t>
+  Where the UDP header is used as defined in Section 3 of <xref target="RFC7510"/>.
+ </t>
+
+ <t>
+  As in <xref target="pwSolution"/>, the S-Label is used to identify a DetNet flow 
+  to the peer node that processes it, in this case the node addressed by the 
+  IP Header in <xref target="IP-encap-dn"/>. The S-Label is allocated from the receiving node?s 
+  platform label space <xref target="RFC3031"/>.
+ </t>
+ <t>
+  In ingress Edge Nodes, the encapsulation in <xref target="IP-encap-dn"/> will be imposed on 
+  Detnet Flow Payload Packets as received from DetNet End Systems, and the encapsulation 
+  will be removed in egress Edge Nodes as they transmit the Payload Packets to the End Systems.
+ </t>
+ <t>
+  Note that this encapsulation works equally well with IPv4 and IPv6.
+ </t>
+ <t>
+  This encapsulation can also be used in conjunction with segment routing as 
+  specified in <xref target="I-D.ietf-spring-segment-routing-mpls"/>. In this 
+  case, the T-Label(s) in <xref target="IP-encap-dn"/> should be retained, 
+  and at each hop, the top T-label is popped and mapped to a corresponding 
+  UDP/IP tunnel, resulting in the following encapsulation:
+ </t>
+
+ <figure title="IP Encapsulation of DetNet with MPLS-SR" anchor="IP-encap-dn-sr">
+ <artwork align="center"><![CDATA[
+  +---------------------------------+
+  |                                 |
+  |           DetNet Flow           |
+  |         Payload  Packet         |
+  |                                 |
+  +---------------------------------+ <--\
+  |       DetNet Control Word       |    |
+  +---------------------------------+    +--> DetNet data plane
+  |           S-Label               |    |    MPLS encapsulation
+  +---------------------------------+ <--/
+  |           T-Label(s)            |
+  +---------------------------------+
+  |           UDP Header            |
+  +---------------------------------+
+  |           IP Header             |
+  +---------------------------------+
+  |           Data-Link             |
+  +---------------------------------+
+  |           Physical              |
+  +---------------------------------+
+]]>
+ </artwork></figure>
+ <t>
+  Again, the UDP header is used as defined in Section 3 of <xref target="RFC7510"/>.
+ </t>
+</section>
+
 <section title="Other DetNet data plane considerations">
   <t> NOTE: these sections are simple copy pasted from earlier document. 
   They may not be needed.  
@@ -1884,6 +2026,7 @@ Client AC   |             |           |             |
    &rfc4385;
    &rfc4023;
    &rfc7510;
+   &I-D.ietf-spring-segment-routing-mpls;
    <?rfc include="reference.RFC.8200"?>
   </references>
   <references title="Informative references">
