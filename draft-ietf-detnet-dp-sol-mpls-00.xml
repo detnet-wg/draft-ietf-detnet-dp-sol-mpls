@@ -962,6 +962,16 @@ Placeholder
     within the DetNet domain. Thus the S-label can only be used to identify the DetNet flow
     at the intended receiving node.
    </t>
+   </section>
+
+   <section title="Indication of the DetNet Payload Type" anchor="PTI-section">
+   <t>
+    The only nodes that needs to know the payload type of a flow are the
+    DetNet ingress node and the DetNet egress nodes.
+    The ingress node has to know how to process the packet it receives
+    from the ingress AC, and egress edge node has to know how to..
+   </t>	   
+	   
    <t>
     <list>
      <t>
