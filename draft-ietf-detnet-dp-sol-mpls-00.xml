@@ -4,7 +4,6 @@
 <!ENTITY rfc3031 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3031.xml">
 <!ENTITY rfc3032 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3032.xml">
 <!ENTITY rfc3985 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3985.xml">
-<!ENTITY rfc4023 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4023.xml">
 <!ENTITY rfc4090 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4090.xml">
 <!ENTITY rfc4385 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4385.xml">
 <!ENTITY rfc4446 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4446.xml">
@@ -29,7 +28,6 @@
 <!ENTITY rfc5085 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5085.xml">
 <!ENTITY rfc5921 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5921.xml">
 <!ENTITY rfc5960 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5960.xml">
-<!ENTITY rfc6073 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6073.xml">
 <!ENTITY rfc6275 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6275.xml">
 <!ENTITY rfc6371 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6371.xml">
 <!ENTITY rfc6373 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6373.xml">
@@ -54,8 +52,6 @@
 <!ENTITY I-D.ietf-detnet-problem-statement PUBLIC "" "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-detnet-problem-statement.xml">
 <!ENTITY I-D.ietf-detnet-architecture PUBLIC "" "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-detnet-architecture.xml">
 <!ENTITY I-D.ietf-mpls-residence-time SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-mpls-residence-time">
-
-<!ENTITY I-D.ietf-6man-segment-routing-header PUBLIC "" "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-6man-segment-routing-header.xml">
 
 ]>
 
@@ -292,20 +288,23 @@
   <figure align="center" anchor="fig_8021_detnet"
   title="IEEE 802.1TSN over DetNet">
   <artwork><![CDATA[
-     TSN    |<---------- End to End DetNet Service ------>|  TSN
-    Service |           Transit           Transit         | Service
-TSN  (AC)   |        |<-Tunnel->|        |<-Tnl->|        |  (AC)  TSN
-End    |    V        V     1    V        V   2   V        V   |    End
-System |    +--------+          +--------+       +--------+   |  System
-+---+  |    |   E1   |==========|   R1   |=======|   E2   |   |   +---+
-|   |--|----|._X_....|..DetNet..|.._ _...|..DF3..|...._X_.|---|---|   |
-|CE1|  |    |    \   |  Flow 1  |   X    |       |   /    |   |   |CE2|
-|   |       |     \_.|...DF2....|._/ \_..|..DF4..|._/     |       |   |
-+---+       |        |==========|        |=======|        |       +---+
-    ^       +--------+          +--------+       +--------+       ^
-    |        Edge Node          Relay Node       Edge Node        |
+     TSN    |<------- End to End DetNet Service ------>|  TSN
+    Service |         Transit          Transit         | Service
+TSN  (AC)   |        |<-Tnl->|        |<-Tnl->|        |  (AC)  TSN
+End    |    V        V    1  V        V   2   V        V   |    End
+System |    +--------+       +--------+       +--------+   |  System
++---+  |    |   E1   |=======|   R1   |=======|   E2   |   |   +---+
+|   |--|----|._X_....|..DF1..|.._ _...|..DF3..|...._X_.|---|---|   |
+|CE1|  |    |    \   |       |   X    |       |   /    |   |   |CE2|
+|   |       |     \_.|..DF2..|._/ \_..|..DF4..|._/     |       |   |
++---+       |        |=======|        |=======|        |       +---+
+    ^       +--------        +--------+       +--------+       ^
+    |        Edge Node       Relay Node       Edge Node        |
     |                                                             |
     |<----- Emulated Time Sensitive Networking (TSN) Service ---->|
+
+    DFx = DetNet Flow x
+
 ]]>
 </artwork>
 </figure>
@@ -765,23 +764,23 @@ Examples
   <figure title="Optimal replication and elimination placement across technology segments example" anchor="fig_pref_xcrs_segments">
   <artwork align="center"><![CDATA[
                                    ______   
-                         _____    /      \__ 
-            ____        /     \__/          \___    ______
-+----+   __/    +======+                        +==+      \     +----+
-|src |__/  Seg1  )     |                        |  \  Seg3 \____| dst|
-+----+  \_______+      \        Segment-2       |   \+_____/    +----+
-                 \======+__                    _+===/
-                           \         __     __/
-                            \_______/  \___/
+                         ____     /      \__ 
+            ____        /     \__/          \___   ______
++----+   __/    +======+                       +==+      \     +----+
+|src |__/  Seg1  )     |                       |  \  Seg3 \____| dst|
++----+  \_______+      \       Segment-2       |   \+_____/    +----+
+                 \======+_                    _+===/
+                          \         __     __/
+                           \_______/  \___/
 
 
-                                          +------------+
-             +------------------E----+    |            |
-+----+       |                  |    +----R---+        |          +----+
-|src |-------R              +---+             |        E----------+ dst|
-+----+       |              |                 E--------+          +----+
-             +--------------R                 |
-                            +-----------------+
+                                       +------------+
+             +---------------E----+    |            |
++----+       |               |    +----R---+        |          +----+
+|src |-------R           +---+             |        E----------+ dst|
++----+       |           |                 E--------+          +----+
+             +-----------R                 |
+                         +-----------------+
   ]]>
     </artwork></figure>
 
@@ -967,10 +966,38 @@ Placeholder
    <section title="Indication of the DetNet Payload Type" anchor="PTI-section">
    <t>
     The only nodes that needs to know the payload type of a flow are the
-    DetNet ingress node and the DetNet egress nodes.
-    The ingress node has to know how to process the packet it receives
-    from the ingress AC, and egress edge node has to know how to..
+    DetNet ingress node and the DetNet egress nodes.  The ingress node
+    has to know how to process the packet it receives from the ingress
+    AC, and egress edge node has to know how to prepare the packet for
+    transmission on the egress AC.
    </t>	   
+   <t>
+    On ingress a DetNet edge node has to classify the packets into those
+    that are for transmission as Detnet packets and those that are for
+    transmission as "normal" packets at one of more lower priorities.
+    The packet type is indicated to the egress edge node through the
+    value of the S-label.  Thus, when the egress edge node looks up the
+    S-label one of the parameters returned is the packet type which in
+    turn tells the egress edge node how to prepare the packet for
+    transmission over the egress AC.
+   </t>
+   <t>
+    The consequence of this approach is that if multiple packet
+    encapsulations are processed on a node, each will need its own
+    S-Label.  That is not generally a problems, since it is anticipated
+    that only one encapsulation type intented for carriage as a DetNet
+    flow will be present on any egress.  However, IPv4 and IPv6 have
+    different forwarding equivalence classes (FEC) in MPLS and are
+    therefore allocated different labels rather than being distinguished
+    through the IP version field in the IP header.  Futhermore IPv4 and
+    IPv6 when running directly over Ethernet are identified via the
+    Ethertype rather than via the IP version number.  Whilst it ought to
+    be safe to identify the IP type though the IP version number the
+    absence this approach in practical applications suggests that it is
+    more conservative to distinguish between IP types through the
+    S-Label.  Thus when the payload is IP, two S-Labels are used, one to
+    identify an IPv4 payload and one to identify an IPv6 payload.
+   </t>
 	   
    <t>
     <list>
@@ -1762,7 +1789,7 @@ Client AC   |             |           |             |
 
   <t>When DetNet is used, there is an underlying assumption that the
   applicaton(s) require clock synchronization such as the Precision Time Protocol
-  (PTP) [IEEE1588]. The relay nodes may or may not utilize clock synchronization
+  (PTP)  <xref target="IEEE1588"/>. The relay nodes may or may not utilize clock synchronization
   in order to provide zero congestion loss and controlled latency delivery.  In either case, there are a
   few possible approaches of
   how synchronization protocol packets are forwarded and handled by the
@@ -2041,12 +2068,9 @@ Client AC   |             |           |             |
    <?rfc include="reference.RFC.5085"?>
    <?rfc include="reference.RFC.5462"?>
    <?rfc include="reference.RFC.6003"?>
-   &rfc6073;
    &rfc4385;
-   &rfc4023;
    &rfc7510;
    &I-D.ietf-spring-segment-routing-mpls;
-   <?rfc include="reference.RFC.8200"?>
   </references>
   <references title="Informative references">
    <?rfc include="reference.RFC.2205"?>
@@ -2057,7 +2081,6 @@ Client AC   |             |           |             |
    <?rfc include="reference.RFC.8040"?>
    &I-D.ietf-detnet-dp-alt;
    &I-D.ietf-detnet-architecture;
-   &I-D.ietf-6man-segment-routing-header;
 
    <reference anchor='I-D.sdt-detnet-security'>
     <front>
