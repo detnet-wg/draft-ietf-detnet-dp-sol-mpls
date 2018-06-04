@@ -839,6 +839,15 @@ Placeholder
    be used to indicate the queue processing as well as the forwarding parameters.
   </t>
   <t>
+   To simplify implementation and to maximize interoperability three sequence number sizes are
+   supported: a 16 bit sequence number, a 28 bit sequence number, and a zero bit sequence number.
+   All three sizes MUST be supported.
+   The 16 bit sequence number is needed to support some types of legacy client. The 28 bit sequence
+   number is used in situations where it is necessary ensure that in high speed networks the
+   sequence number space does not wrap whilst packets are in flight. A zero length sequence
+   number is used if sequence numbers are not required by a particular DetNet flow.
+  </t>
+  <t>
    Note that when the network consists only of DetNet enabled nodes with no aggregation, Penultimate
    Hop Popping (PHP) means that the only label in the label stack is the S-label.
   </t>
@@ -909,19 +918,16 @@ Placeholder
   <t>
    A DetNet control word (d-CW) conforms to the Generic PW MPLS Control Word (PWMCW) defined in
    <xref target="RFC4385"/> and is illustrated in  <xref target="fig_detnet_cw"/>.  The upper nibble
-   of the d-CW MUST be set to zero (0). The effective sequence number bit length is between 0 and 28
-   bits, and configured either by a control plane or manually for each DetNet flow. The sequence
+   of the d-CW MUST be set to zero (0). Three sequence number sizes are supported: 0 bits, 16 bits, and 28 
+   bits. The sequence number size in use for the d-CW associated with a DetNet flow (S-Label) 
+   is configured either by a control plane or manually for each DetNet flow. The sequence
    number is aligned to the right (least significant bits) and unused bits MUST be set to zero (0).
    Each DetNet flow MUST have its own sequence number counter. The sequence number is incremented by
    one for each new packet.
   </t>
   <t>
-   The d-CW MUST always be present in a packet. In a case the sequence number is not used (e.g., for
-   DetNet-t-flows) the control plane or the manual configuration has to define zero (0) bit length
-   sequence number and the value of the sequence number MUST be set to zero (0).
-  </t>
-  <t>
-   [Editor's'note: TSN compatibility to be ensured (16 bits vs. 28 bits).]
+   The d-CW MUST always be present in a packet. In a case where the sequence number is not used (e.g., for
+   DetNet-t-flows) a zero length sequence number is used and the sequence number MUST be set to zero (0).
   </t>
   
     <figure title="DetNet Control Word" anchor="fig_detnet_cw">
