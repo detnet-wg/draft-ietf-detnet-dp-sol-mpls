@@ -159,11 +159,11 @@
     label used between label switching routers (LSR).</t>
     
     <t hangText="S-Label">A DetNet "service" label that is used between DetNet
-    nodes that implment also the DetNet service layer functions. An S-Label is
+    nodes that implement also the DetNet service layer functions. An S-Label is
     also used to identify a DetNet flow at DetNet service layer.</t>
 	
     <t hangText="PEF">
-     A Packet Elimination Function (PEF) elimates duplicate copies of packets received
+     A Packet Elimination Function (PEF) eliminates duplicate copies of packets received
      by an edge or a relay node to prevent excess packets flooding the network, or to
      prevent duplicate packets being sent out of the DetNet domain.
     </t>
@@ -425,17 +425,6 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
  </t>
  </list></t>
  <t>
-  Each DetNet node (edge, relay and transit) use an internal/implementation specific local-ID of the
-  DetNet-(compound)-flow in order to accomplish its role during transport. Recognizing the DetNet
-  flow is more relaxed for edge and relay nodes, as they are fully aware of both the DetNet service
-  and transport layers. The primary DetNet role of intermediate transport nodes is limited to
-  ensuring congestion protection and latency control for the above listed DetNet functions.
- </t>
- <t>
-  [Note to Editors. I am not convinced that the previous para adds value. It certainly has
-  the opportunity to add confusion. I think it needs to be deleted - SB] 
- </t>
- <t>
   The DetNet data plane allows for the aggregation of DetNet flows, e.g., via MPLS hierarchical
   LSPs, to improved scaling.  When DetNet flows are aggregated, transit nodes may have limited
   ability to provide service on per-flow DetNet identifiers. Therefore, identifying each individual
@@ -454,12 +443,12 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
  </t>
 
  <t>
-  On each DetNet node dealing with DetNet flows, an internal local-ID is assumed to determine what
-  local operation a packet goes through. Therefore, local-IDs has to be unique on each edge and
-  relay nodes. Local-ID is unambiguously bound to the DetNet flow. 
- </t>
- <t>
-   [Note to Editor - again I think previous para needs to be removed]
+  A node operating on a DetNet flow in the Detnet layer, i.e. a node processing a
+  DetNet packet which has the S-label as top of stack uses the local context
+  associated with that S-label to determine what local operation(s) are 
+  applied to that packet. The S-label has to be unique on each edge and
+  relay node, which is achieved by using a label taken from the platform
+  label space {{RFC3031}}.
  </t>
  </section>
 
@@ -475,7 +464,7 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
    PRF and PEF utilizes a sequence number that is carried within the DetNet flow packet.
   </t>
   <t>
-   The order in which a node applies the PEF and the PRF to a DetNet flow is implimentation 
+   The order in which a node applies the PEF and the PRF to a DetNet flow is implementation 
    specific.
   </t>
   <t>
@@ -751,9 +740,9 @@ Examples
   </t>
   
   <t> An important aspect of DetNet network design is placement of DetNet functions across the
-  domain. Designs based on segment-by-segment optimization can provide only suboptimal solutions. In
+  domain. Designs based on segment-by-segment optimization can provide only sub-optimal solutions. In
   order to achieve global optimum Inter-Working Functions (DN-IWF) can be placed at segment border
-  nodes, which stich together DetNet flows across connected segments.    </t>
+  nodes, which stitch together DetNet flows across connected segments.    </t>
  
   <t> DN-IWF may ensure that flow attributes are correlated across segment borders. For example,
   there are two DetNet functions which require Sequence Numbers: (1) Elimination: removes duplications
@@ -929,7 +918,7 @@ Placeholder
   <t>
    The d-CW MUST always be present in a packet. In a case the sequence number is not used (e.g., for
    DetNet-t-flows) the control plane or the manual configuration has to define zero (0) bit length
-   seqeunce number and the value of the sequence number MUST be set to zero (0).
+   sequence number and the value of the sequence number MUST be set to zero (0).
   </t>
   <t>
    [Editor's'note: TSN compatibility to be ensured (16 bits vs. 28 bits).]
@@ -948,8 +937,8 @@ Placeholder
   <section title="Flow Identification">   
    <t>
     DetNet flow identification at a DetNet service layer is realized by an S-label. 
-    The S-lable is allocated from the platform label label space <xref target="RFC3031"/>
-    Thich means that the DetNet flow is correctly identified and matched to the 
+    The S-label is allocated from the platform label label space <xref target="RFC3031"/>
+    which means that the DetNet flow is correctly identified and matched to the 
     flow parameters, including the flow history, regardless of which input interface 
     the packet arrives on.
     The S-label MUST be at the bottom label of the label stack for a DetNet-s- or DetNet-st-flow and
@@ -957,7 +946,7 @@ Placeholder
    </t>
    <t>
     The S-label for a specific DetNet flow is unique to that DetNet flow on a specific node, but
-    is not required to be identical with the S-lable for that DetNet flow in any other node
+    is not required to be identical with the S-label for that DetNet flow in any other node
     within the DetNet domain. Thus the S-label can only be used to identify the DetNet flow
     at the intended receiving node.
    </t>
@@ -985,7 +974,7 @@ Placeholder
     The consequence of this approach is that if multiple packet
     encapsulations are processed on a node, each will need its own
     S-Label.  That is not generally a problems, since it is anticipated
-    that only one encapsulation type intented for carriage as a DetNet
+    that only one encapsulation type intended for carriage as a DetNet
     flow will be present on any egress.  However, IPv4 and IPv6 have
     different forwarding equivalence classes (FEC) in MPLS and are
     therefore allocated different labels rather than being distinguished
@@ -1316,7 +1305,7 @@ Client AC   |             |           |             |
 		   Relay node was a DetNet aware S-PE originally, which is not explicitly stated here anymore, thus
                    slightly confusing text here. The text here needs to clarify the roles of PROEF and switching
 		   functions. A DetNet relay is described in the architecture document. However, there is definitely
-		   room for termonilogy and text improvements.
+		   room for terminology and text improvements.
   	 </t>
 	</list>
      </t>
