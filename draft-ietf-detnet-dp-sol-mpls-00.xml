@@ -839,9 +839,9 @@ Placeholder
    be used to indicate the queue processing as well as the forwarding parameters.
   </t>
   <t>
-   To simplify implementation and to maximize interoperability three sequence number sizes are
-   supported: a 16 bit sequence number, a 28 bit sequence number, and a zero bit sequence number.
-   All three sizes MUST be supported.
+   To simplify implimentation and to maximize interoperability three sequence number sizes are
+   supported: a 16 bit sequence number and a 28 bit sequence number and a zero bit sequence number.
+   All thres sizes MUST be supported.
    The 16 bit sequence number is needed to support some types of legacy client. The 28 bit sequence
    number is used in situations where it is necessary ensure that in high speed networks the
    sequence number space does not wrap whilst packets are in flight. A zero length sequence
@@ -918,7 +918,7 @@ Placeholder
   <t>
    A DetNet control word (d-CW) conforms to the Generic PW MPLS Control Word (PWMCW) defined in
    <xref target="RFC4385"/> and is illustrated in  <xref target="fig_detnet_cw"/>.  The upper nibble
-   of the d-CW MUST be set to zero (0). Three sequence number sizes are supported: 0 bits, 16 bits, and 28 
+   of the d-CW MUST be set to zero (0). Three sequence number sizes are supported: 0 bits, 16 bits and 28 
    bits. The sequence number size in use for the d-CW associated with a DetNet flow (S-Label) 
    is configured either by a control plane or manually for each DetNet flow. The sequence
    number is aligned to the right (least significant bits) and unused bits MUST be set to zero (0).
@@ -1175,117 +1175,47 @@ Placeholder
   </section>
  </section>
 
- <section title="Service layer considerations">
+ <section title="Service Layer Considerations">
    <t>
-    [Editor's note: quite a bit of unfinished and old text in the following sections.]
+    The edge and relay node internal procedures of the PROEF are implementation specific.  The order
+    of a packet elimination or replication is out of scope in this specification. However, care
+    should be taken that the replication function does not actually loopback packets as "replicas".
+    Looped back packets include artificial delay when the node that originally initiated the packet
+    receives it again. Also, looped back packets may make the network condition to look healthier
+    than it actually is (in some cases link failures are not reflected properly because looped back
+    packets make the situation appear better than it actually is). 
    </t>
-   <t></t>
    <t>
-    [Editor's note: when this section is re-written a reference to <xref target="PTI-section"/> should be included]
+    It is important that the DetNet layer is configured such that a DetNet node never 
+    receives its own replicated packets. If it were to receive such packets the replication
+    function would make the loop more destructive of bandwidth than a conventional unicast loop.
+    Ultimately the TTL in the S-Label will cause the packet to die during a transient, but
+    given the sensitivity of applications to packet latency the impact on the  DetNet application
+    would be severe.
    </t>
    <t>
-     The edge and relay node internal procedures of the PROEF are implementation specific.  The order
-     of a packet elimination or replication is out of scope in this specification. However, care
-     should be taken that the replication function does not actually loopback packets as "replicas".
-     Looped back packets include artificial delay when the node that originally initiated the packet
-     receives it again. Also, looped back packets may make the network condition to look healthier
-     than it actually is (in some cases link failures are not reflected properly because looped back
-     packets make the situation appear better than it actually is). 
-     <list style="hanging">
-	   <t hangText="Comment #4:">
-           SB> There needs to be some text about preventing a node ever receiving its
-           own replicated packets. Indeed that would suggest that the flow
-           id should be changed and replication should only take place on 
-           configured flow IDs. I have a feeling that this would all be a lot safer if replication
-           only happened at ingress and we managed the diversity of the paths.
-          </t>
-	  <t hangText="Discussion:">
-		  Agree on hardening the loopback text considerations.
-	  </t>
-     </list>
+    Transient loops may be avoided my taking care in the configuration of the DetNet path, and
+    ensuring that if a path is modified, that such loops cannot form regardless of the order
+    of node FIB update.
    </t>
-
-
-
 
    <section title="Edge node processing" anchor="sec_t_pe">
     <t>
-     TBD.
+     An edge node is resposable for matching ingress packets to the service they require and
+     encapsulating them accordingly.An edge node may participate in the packet replication and 
+     duplication elimination. This may be done in the DetNet layer, or where the native service
+     processing (NSP) <xref target="RFC3985"/> is IEEE 802.1CB <xref target="IEEE8021CB"/> capable, 
+     the packet replication and duplicate elimination MAY entirely be done in the NSP, bypassing 
+     the DetNet flow encapsulation and logic entirely. This enables operating over unmodified 
+     implementations and deployments. The NSP approach works only between edge nodes and cannot 
+     make use of relay nodes.
     </t>
     <t>
-     [Editor's note: Since we are not defining the inner workings and implementation of the DetNet
-     Egde node - rather only what goes in and what comes out, and of course the on-wire details,
-     then the figures shown in the coming section would not need to detail the inner architecture of
-     a DetNet Node.]
-    </t>
-
-    <figure title="DetNet Edge Node processing" anchor="fig_detnet_edge">
-    <artwork align="center"><![CDATA[
-            +---------------------------------------+
-            |           DetNet Edge Node            |
-            +---------------------------------------+  
-            |             |           |             |   
-            |             |           |             |             
-Client AC   |         +---o <-------> o             o<---------->
-            |   Elim. |   |           |             |
-<---------->o <-------|   |           +-------------+ 
-            |         |   |           |             |
-            |         +---o <-------> o             |
-            |             |           |             o<---------->
-            |             |       +-> o             |
-            +-------------+       |   +-------------+
-            |             |       |   |             |
-Client AC   |             | Repl. |   |             |
-<---------->o             o <-----X-> o             o<---------->
-            |             | Elim.     |             |
-            +-------------+           +-------------+
-            |             |           |             |
-Client AC   |             |           |             |
-<---------->o             o <-------> o             o<---------->
-            |             |           |             |
-            +---------------------------------------+
-]]>
-    </artwork></figure>
-
-    <t>
-     An edge node participates to the packet replication and duplication elimination. Required
-     processing is done within an extended forwarder function. In the case the native service
-     processing (NSP) is IEEE 802.1CB <xref target="IEEE8021CB"/> capable, the packet replication
-     and duplicate elimination MAY entirely be done in the NSP and bypassing the DetNet flow
-     encapsulation and logic entirely, and thus is able to operate over unmodified implementation
-     and deployment. The NSP approach works only between edge nodes and cannot make use of relay nodes
-     (see <xref target="sec_s_pe"/>).
-    <list style="hanging">
-	   <t hangText="Comment #5">
-		   SB> This would be a fine way to operate the PW system - edge to edge.
-	   </t>
-	   <t hangText="Discussion:">
-		   When it comes to use of NSPs, agree. Also for "island interconnect" this is
-		   a fine. However, when there is a need to do PROEF in a middle, plain edge to edge
-		   is not enough.
-  	 </t>
-	</list>
+     The NSP approach is useful end to end tunnel and for for "island interconnect" 
+     scenarios. However, when there is a need to do PROEF in a middle of the network, 
+     such plain edge to edge operation is not sufficient.
     </t>
     <t>
-     The DetNet-aware extended forwarder selects the egress DetNet member flow based on the DetNet forwarding rules.
-	 In both "normal AC" and "Packet AC"
-     cases there may be no DetNet encapsulation header available yet as it is the case with relay nodes
-     (see <xref target="sec_s_pe"/>).  It is the responsibility of the extended forwarder within the
-     edge node to push the DetNet specific encapsulation (if not already present) to the packet before
-     forwarding it to the appropriate egress DetNet member flow instance(s).
-    <list style="hanging">
-	   <t hangText="Comment #6">
-	   SB> I am not convinced of the wisdom of having a mid-point node convert
-           a flow into a DN flow, which is what you are implying here. This seems
-           like an ingress function.
-           </t>
-	   <t hangText="Discussion:">
-               OK. The text here has issues and seems to mix relay and edge.
-  	 </t>
-	</list>
-     </t>
-
-     <t>
       The extended forwarder MAY copy the sequencing information from the native DetNet packet into
       the DetNet sequence number field and vice versa. If there is no existing sequencing
       information available in the native packet or the forwarder chose not to copy it from the
@@ -1297,34 +1227,21 @@ Client AC   |             |           |             |
 
    <section title="Relay node processing" anchor="sec_s_pe">
     <t>
-     A DetNet Relay node participates to the packet replication and duplication
-     elimination. This processing is done within an extended forwarder function.
-     Whether an ingress DetNet member flow receives DetNet specific processing depends on how
-     the forwarding is programmed.  For some DetNet member flows the relay node can act as a normal relay node
-     and for some apply the DetNet specific processing (i.e., PROEF).
-    <list style="hanging">
-	   <t hangText="Comment #7">
-           SB> Again relay node is not a normal term, so am not sure what it does
-            in the absence of a PROEF function.
-           </t>
-	   <t hangText="Discussion:">
-		   Relay node was a DetNet aware S-PE originally, which is not explicitly stated here anymore, thus
-                   slightly confusing text here. The text here needs to clarify the roles of PROEF and switching
-		   functions. A DetNet relay is described in the architecture document. However, there is definitely
-		   room for terminology and text improvements.
-  	 </t>
-	</list>
+     A DetNet Relay node operates in the DetNet layer and MAY participate in the packet 
+     replication and duplication elimination process. This processing is done within an 
+     extended forwarder function. Whether an ingress DetNet member flow receives DetNet specific 
+     processing depends on how the forwarding is programmed.  For some DetNet member flows the 
+     relay node can act as a normal relay node (for example act as a PW-S-PE) and for some 
+     apply the DetNet specific processing (i.e., PROEF).
      </t>
-
-     <t> It
-     is also possible to
-     treat the relay node as a transit node, see <xref target="Aggregation"/>.
+     <t> It is also possible to
+     treat the relay node as a transit node, see <xref target="Aggregation"/>.yes
      Again, this is
      entirely up to how the forwarding has been programmed.
     </t>
     <t>
      The DetNet-aware forwarder selects the egress DetNet member flow segment based on the flow identification.  
-	 The mapping of ingress DetNet member flow segment to egress DetNet member flow segment may be
+     The mapping of ingress DetNet member flow segment to egress DetNet member flow segment may be
      statically or dynamically configured. Additionally the DetNet-aware
      forwarder does duplicate frame elimination based on the flow identification and
      the sequence number combination. The packet replication is
@@ -1332,65 +1249,15 @@ Client AC   |             |           |             |
      replication process the sequence number of the DetNet member flow MUST
      be preserved and copied to the egress DetNet member flow.
     </t>
-
-    <figure title="DetNet Relay Node processing" anchor="fig_detnet_relay">
-    <artwork align="center"><![CDATA[
-            +---------------------------------------+
-            |          DetNet Relay Node            |
-  Ingress   +---------------------------------------+
-            |             |           |             |   Egress
-            |             o---------> o--+  Elim.   | 
------------>o             |           |  +--------->o----------->
-            |             |   +-----> o--+          |
-  Ingress   +-------------+   |       +-------------+ 
-            |             |   |       |             |   Egress
-            |             |   |       |             |
------------>o             o --+   +-> o             o----------->
-            |             |       |   |             |
-  Ingress   +-------------+       |   +-------------+
-            |             |       |   |             |   Egress
-            |             | Repl. |   |             |
------------>o             o ------+-> o             o----------->
-            |             |           |             |
-  Ingress   +-------------+           +-------------+
-            |             |           |             |   Egress
-            |             |           |             |
------------>o             o --------> o             o----------->
-            |             |           |             |
-            +---------------------------------------+
-]]>
-    </artwork></figure>
     <t>
-    <list style="hanging">
-	   <t hangText="Comment #8">
-           SB> Somewhere in the dp document there needs to be a note of the 
-             requirement for interfaces to do fast exchange of counter state,
-             and a note to those planning the network and designing the 
-             control plane that they need to provide support for this.
-             </t>
-         <t hangText="Discussion:">
-		 We kinf of agree but also think the above exchange or synchronization of
-		 counter states is not in our scope to solve.
-  	 </t>
-	</list>
+     The internal design of a relay node is out of scope of this document. However
+     the reader's attention is drawn to the need to make any PROEF state 
+     available to the packet processor(s) dealing with packets to which the 
+     PROEF functions must be applied, and to maintain that state is such as
+     way that it is available to the packet processor operation on the next
+     packet in the DetNet flow (which may be a duplicate, a late packet, or
+     the next packet in sequence.
     </t>
-    </section>
-    <section title="End system processing" anchor="sec_end_system">
-     <t>
-       TBD.
-     </t>
-    </section>
-   </section>
-   <section title="Transport node considerations">
-    <section title="Congestion protection">
-     <t>
-      TBD.
-     </t>
-    </section>
-    <section title="Explicit routes">
-     <t>
-      TBD.
-     </t>
     </section>
    </section>
  </section>
