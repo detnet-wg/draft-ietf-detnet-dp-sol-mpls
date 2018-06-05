@@ -234,8 +234,8 @@
 
  <section title="DetNet data plane overview" anchor="sec_dt_dp">
   <t>
-   This document describes how to use IP and/or MPLS to support a data plane method of flow
-   identification and packet formwarding over layer-3. Two different cases are covered: (i) the
+   This document describes how to carry DetNet flows over MPLS and over MPLS over IP. 
+   Two different cases are covered: (i) the
    inter-connect scenario, in which IEEE802.1 TSN is routed over a layer-3 network (i.e., to enlarge
    the layer-2 domain), and (ii) native connectivity between DetNet-aware end systems.
   </t>
@@ -395,26 +395,6 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
    <t>Explicit routes: select/apply the flow specific path.</t>
    <t>Service protection: recognize DetNet compound and member flows for replication an elimination.</t>
   </list>
-    <list style="hanging">
-	   <t hangText="Comment #1">
-            I am not sure whether the correct architectural construct is flow
-            or flow group. Flow suggests that sharing/aggregation is not allowed
-            but whether this is allowed or not is an application specific issue.
-           </t>
-	   <t hangText="Discussion:">
-            Agree that a flow group would be a better characterization. 
-  	 </t>
-	   <t hangText="Comment #2">
-            I think that there needs to be some clarification as to whether FG is
-            is understood by the DN system exclusively or whether there is an 
-            expectation that it is understood by the underlay.
-           </t>
-	   <t hangText="Discussion:">
-            Agree that more detail is needed here. DetNet aware nodes need to
-	    understand flow groups. Underlay needs to be aware of flow groups at
-	    the resource allocation level.
-  	 </t>
-	</list>
  </t>
  <t>OAM function related scenarios:
   <list style="symbols">
@@ -431,16 +411,6 @@ CE1----EN1--------R1-------R2-------R3--------EN2----CE2
   ability to provide service on per-flow DetNet identifiers. Therefore, identifying each individual
   DetNet flow on a transit node may not be achieved in some network scenarios, but DetNet service
   can still be assured in these scenarios through resource allocation and control.
-    <list style="hanging">
-	   <t hangText="Comment #3">
-           You could introduce the concept of a flow group identified into the
-           packet. You may also include a flow id at a lower layer.
-           </t>
-	  <t hangText="Discussion:">
-		  Agree on the identification properties. Adding a specific id into actual
-		  on-wire formats is not necessarily needed.
-	  </t>
-	</list>
  </t>
 
  <t>
@@ -993,16 +963,6 @@ Placeholder
     more conservative to distinguish between IP types through the
     S-Label.  Thus when the payload is IP, two S-Labels are used, one to
     identify an IPv4 payload and one to identify an IPv6 payload.
-   </t>
-	   
-   <t>
-    <list>
-     <t>
-      [Editor's note: We have specified the above for _data_ to leave the door open for the GAL
-      based OAM method as an alternative to the ACH mechanism currently specified.  When using GAL
-      the GAL label would be after the S-Label.  Do we leave this option in or shut the door on it?]
-     </t>
-    </list>
    </t>
   </section>
 
@@ -1760,7 +1720,8 @@ Placeholder
 
 
 <section anchor="iana" title="IANA considerations">
-  <t>TBD.
+  <t>
+   This document makes no IANA requests.   
   </t>
 </section>
 
