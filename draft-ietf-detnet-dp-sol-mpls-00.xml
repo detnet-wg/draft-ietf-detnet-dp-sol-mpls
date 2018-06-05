@@ -4,6 +4,7 @@
 <!ENTITY rfc3031 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3031.xml">
 <!ENTITY rfc3032 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3032.xml">
 <!ENTITY rfc3985 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3985.xml">
+<!ENTITY rfc4023 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4023.xml">
 <!ENTITY rfc4090 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4090.xml">
 <!ENTITY rfc4385 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4385.xml">
 <!ENTITY rfc4446 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4446.xml">
@@ -1288,7 +1289,7 @@ Placeholder
   described in <xref target="pwSolution"/>. 
  </t>
  <t>
-  To simplify operations and implementations, rather than inventing a brand new 
+  To simplify operations and implementations, rather than inventing a new 
   encapsulation, the IP encapsulation takes advantage of the MPLS encapsulation. 
   By using the specification of MPLS over UDP and IP in <xref target="RFC7510"/>, 
   the T-Label(s) shown in <xref target="fig_pw_mpls"/> in <xref target="pwSolution"/> 
@@ -1369,6 +1370,13 @@ Placeholder
  </artwork></figure>
  <t>
   Again, the UDP header is used as defined in Section 3 of <xref target="RFC7510"/>.
+ </t>
+ <t>
+  Note that if required in both the case of IP Encapsulation of DetNet
+  <xref target="IP-encap-dn"/>, and of IP Encapsulation of DetNet with MPLS-SR
+  <xref target="IP-encap-dn-sr"/>, it is possible to omit the UDP header
+  if required. Operation of MPLS directly over IP is described in
+  <xref target="RFC4023"/>.
  </t>
 </section>
 
@@ -1863,6 +1871,7 @@ Placeholder
    <?rfc include="reference.RFC.3270"?>
    <?rfc include="reference.RFC.3443"?>
    <?rfc include="reference.RFC.3473"?>
+   &rfc4023;
    <?rfc include="reference.RFC.4206"?>
    <?rfc include="reference.RFC.5129"?>
    <?rfc include="reference.RFC.5085"?>
