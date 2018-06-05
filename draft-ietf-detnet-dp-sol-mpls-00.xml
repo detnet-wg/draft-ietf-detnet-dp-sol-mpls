@@ -1381,15 +1381,10 @@ Placeholder
 </section>
 
 <section title="Other DetNet data plane considerations">
-  <t> NOTE: these sections are simple copy pasted from earlier document. 
-  They may not be needed.  
-  </t>
  <section title="Class of Service">
-  <t> [Editor's NOTE: delete this section.]
-  </t>
    <t>
      Class and quality of service, i.e., CoS and QoS, are terms that are
-     often used interchangeably and confused.  In the context of DetNet,
+     often used interchangeably and confused with each other. In the context of DetNet,
      CoS is used to refer to mechanisms that provide traffic forwarding
      treatment based on aggregate group basis and QoS is used to refer
      to mechanisms that provide traffic forwarding treatment based on a
@@ -1431,58 +1426,57 @@ Placeholder
  </section>
 
  <section title="Quality of Service">
-  <t> [Editor's NOTE: delete this section.]
+  <t>
+   Quality of Service (QoS) mechanisms for flow specific traffic treatment typically includes a
+   guarantee/agreement for the service, and allocation of resources to support the service.
+   Example QoS mechanisms include discrete resource allocation, admission control, flow
+   identification and isolation, and sometimes path control, traffic protection, shaping, policing
+   and remarking. Example protocols that support QoS control include <xref
+   target="RFC2205">Resource ReSerVation Protocol (RSVP)</xref> (RSVP) and RSVP-TE <xref
+   target="RFC3209"/> and <xref target="RFC3473"/>.  The existing MPLS mechanisms defined to
+   support CoS <xref target="RFC3270"/> can also be used to reserve resources for specific traffic
+   classes. 
   </t>
-    <t>
-     Quality of Service (QoS) mechanisms for flow specific traffic treatment typically includes a
-     guarantee/agreement for the service, and allocation of resources to support the service.
-     Example QoS mechanisms include discrete resource allocation, admission control, flow
-     identification and isolation, and sometimes path control, traffic protection, shaping, policing
-     and remarking. Example protocols that support QoS control include <xref
-     target="RFC2205">Resource ReSerVation Protocol (RSVP)</xref> (RSVP) and RSVP-TE <xref
-     target="RFC3209"/> and <xref target="RFC3473"/>.  The existing MPLS mechanisms defined to
-     support CoS <xref target="RFC3270"/> can also be used to reserve resources for specific traffic
-     classes. 
-    </t>
-    <t>
-     In addition to explicit routes, and packet replication and elimination, described in <xref
-     target="dn-dt-solution"/> above, DetNet provides zero congestion loss and bounded latency and
-     jitter.  As described in <xref target="I-D.ietf-detnet-architecture"/>, there are different
-     mechanisms that maybe used separately or in combination to deliver a zero congestion loss
-     service.  These mechanisms are provided by the either the MPLS or IP layers, and may be
-     combined with the mechanisms defined by the underlying network layer such as 802.1TSN.
-    </t>
-   <t>
-     A baseline set of QoS capabilities for DetNet flows carried in PWs
-     and MPLS can provided by MPLS with Traffic Engineering (MPLS-TE)
-     <xref target="RFC3209"/> and <xref target="RFC3473"/>.  TE LSPs can
-     also support explicit routes (path pinning).  Current service
-     definitions for packet TE LSPs can be found in "Specification of
-     the Controlled Load Quality of Service", <xref target="RFC2211"/>,
-     "Specification of Guaranteed Quality of Service", <xref
-     target="RFC2212"/>, and "Ethernet Traffic Parameters", <xref
-     target="RFC6003"/>. Additional service definitions are expected in
-     future documents to support the full range of DetNet services.
-     In all cases, the existing label-based marking mechanisms defined
-     for TE-LSPs and even E-LSPs are use to support the identification
-     of flows requiring DetNet QoS.
-   </t>
-   <t>
-    Packets that are marked with a DetNet Class of Service value, but that have not been
-    the subject of a completed reservation, can disrupt the QoS offered to properly
-    reserved DetNet flows by using resources allocated to the reserved flows.  Therefore,
-    the network nodes of a DetNet network MUST:
+  <t>
+   In addition to explicit routes, and packet replication and elimination, described in <xref
+   target="dn-dt-solution"/> above, DetNet provides zero congestion loss and bounded latency and
+   jitter.  As described in <xref target="I-D.ietf-detnet-architecture"/>, there are different
+   mechanisms that maybe used separately or in combination to deliver a zero congestion loss
+   service.  These mechanisms are provided by the either the MPLS or IP layers, and may be
+   combined with the mechanisms defined by the underlying network layer such as 802.1TSN.
+  </t>
+  <t>
+   A baseline set of QoS capabilities for DetNet flows carried in PWs
+   and MPLS can provided by MPLS with Traffic Engineering (MPLS-TE)
+   <xref target="RFC3209"/> and <xref target="RFC3473"/>.  TE LSPs can
+   also support explicit routes (path pinning).  Current service
+   definitions for packet TE LSPs can be found in "Specification of
+   the Controlled Load Quality of Service", <xref target="RFC2211"/>,
+   "Specification of Guaranteed Quality of Service", <xref
+   target="RFC2212"/>, and "Ethernet Traffic Parameters", <xref
+   target="RFC6003"/>. Additional service definitions are expected in
+   future documents to support the full range of DetNet services.
+   In all cases, the existing label-based marking mechanisms defined
+   for TE-LSPs and even E-LSPs are use to support the identification
+   of flows requiring DetNet QoS.
+  </t>
+  <t>
+   Packets that are marked with a DetNet Class of Service value, but that have not been
+   the subject of a completed reservation, can disrupt the QoS offered to properly
+   reserved DetNet flows by using resources allocated to the reserved flows.  Therefore,
+   the network nodes of a DetNet network:
     
-    <list style="symbols">
-      <t>
-          Defend the DetNet QoS by discarding or remarking (to a non-DetNet CoS)
-          packets received that are not the subject of a completed reservation.
-      </t><t>
-          Not use a DetNet reserved resource, e.g. a queue or shaper reserved for
-          DetNet flows, for any packet that does not carry a DetNet Class of Service
-          marker.
-      </t>
-    </list>
+   <list style="symbols">
+    <t>
+     MUST defend the DetNet QoS by discarding or remarking (to a non-DetNet CoS)
+     packets received that are not the subject of a completed reservation.
+    </t>
+    <t>
+     MUST NOT use a DetNet reserved resource, e.g. a queue or shaper reserved for
+     DetNet flows, for any packet that does not carry a DetNet Class of Service
+     marker.
+    </t>
+   </list>
   </t>
  </section>
 
