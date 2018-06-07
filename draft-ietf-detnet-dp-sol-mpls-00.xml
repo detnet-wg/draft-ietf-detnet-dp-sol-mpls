@@ -810,13 +810,23 @@ Placeholder
    be used to indicate the queue processing as well as the forwarding parameters.
   </t>
   <t>
-   To simplify implimentation and to maximize interoperability three sequence number sizes are
-   supported: a 16 bit sequence number and a 28 bit sequence number and a zero bit sequence number.
-   All thres sizes MUST be supported.
+   To simplify implementation and to maximize interoperability two sequence number sizes are
+   supported: a 16 bit sequence number and a 28 bit sequence number. 
    The 16 bit sequence number is needed to support some types of legacy client. The 28 bit sequence
    number is used in situations where it is necessary ensure that in high speed networks the
-   sequence number space does not wrap whilst packets are in flight. A zero length sequence
-   number is used if sequence numbers are not required by a particular DetNet flow.
+   sequence number space does not wrap whilst packets are in flight. In addition it must be
+   possible to send a packet with a zero length sequence number, to support the case
+   where sequence numbers are not required by a particular DetNet flow.
+  </t>
+  <t>
+   Note that the concept of a zero length sequence number is not to be confused with a sequence
+   number of zero. For example, were the sequence number size is 16 bits, the sequence will contain:
+   635535, 0, 1. In this case zero is an ordinary sequence number. Unlike 
+   <xref target="RFC4448"/> a sequence number of zero does not indicate that no sequence number
+   is in use. Where sequence numbers are not in use, and thus a zero length sequence number is
+   in used, the sequence number field in the packet is sent as zero. The DetNet packet forwarder
+   knows which of these cases applies through parameters associated with each specific 
+   DetNet flow.
   </t>
   <t>
    Note that when the network consists only of DetNet enabled nodes with no aggregation, Penultimate
@@ -889,12 +899,18 @@ Placeholder
   <t>
    A DetNet control word (d-CW) conforms to the Generic PW MPLS Control Word (PWMCW) defined in
    <xref target="RFC4385"/> and is illustrated in  <xref target="fig_detnet_cw"/>.  The upper nibble
-   of the d-CW MUST be set to zero (0). Three sequence number sizes are supported: 0 bits, 16 bits and 28 
+   of the d-CW MUST be set to zero (0). Two  sequence number sizes are supported: 16 bits and 28 
    bits. The sequence number size in use for the d-CW associated with a DetNet flow (S-Label) 
    is configured either by a control plane or manually for each DetNet flow. The sequence
    number is aligned to the right (least significant bits) and unused bits MUST be set to zero (0).
    Each DetNet flow MUST have its own sequence number counter. The sequence number is incremented by
    one for each new packet.
+  </t>
+  <t>
+   As discussed in <xref target="dn-dt-solution"/>, zero is an ordinary sequence number with
+   no special meaning. Also as discussed therein,
+   where no sequence number is used by a particular DetNet flow, the sequence number field in
+   the d-CW is set to zero.
   </t>
   <t>
    The d-CW MUST always be present in a packet. In a case where the sequence number is not used (e.g., for
@@ -1884,6 +1900,7 @@ Placeholder
   <references title="Informative references">
    <?rfc include="reference.RFC.2205"?>
    &rfc3985;
+   &rfc4448;
    <?rfc include="reference.RFC.5654"?>
    <?rfc include="reference.RFC.7551"?>
    <?rfc include="reference.RFC.7950"?>
