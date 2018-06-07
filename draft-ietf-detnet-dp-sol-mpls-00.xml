@@ -1673,7 +1673,7 @@ Placeholder
     is through the use of the management controller.
    </t>
    <t>
-    Editor's note a method of seting up a graph through the DetNet Nodes using the IGP
+    Editor's note a method of setting up a graph through the DetNet Nodes using the IGP
     has been proposed, but at the time of writing I (Stewart) have forgotten the 
     reference.
    </t>
@@ -1682,7 +1682,7 @@ Placeholder
     explicit routes/paths in the MPLS layer:
     <list style="symbols">
      <t>
-      The path can be explicitly set up by the managemement controller calculating the path and
+      The path can be explicitly set up by the management controller calculating the path and
       explicitly configuring each node along that path. 
      </t>
      <t>
@@ -1690,7 +1690,7 @@ Placeholder
       to the explicit path.
      </t>
      <t>
-      The path can be implimented using segment routing.
+      The path can be implemented using segment routing.
      </t>
     </list>
    </t>
