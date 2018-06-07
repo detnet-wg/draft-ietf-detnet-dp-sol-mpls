@@ -1170,12 +1170,7 @@ Placeholder
     given the sensitivity of applications to packet latency the impact on the  DetNet application
     would be severe.
    </t>
-   <t>
-    Transient loops may be avoided my taking care in the configuration of the DetNet path, and
-    ensuring that if a path is modified, that such loops cannot form regardless of the order
-    of node FIB update.
-   </t>
-
+  
    <section title="Edge node processing" anchor="sec_t_pe">
     <t>
      An edge node is resposable for matching ingress packets to the service they require and
