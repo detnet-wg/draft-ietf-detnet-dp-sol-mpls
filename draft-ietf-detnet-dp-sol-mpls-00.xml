@@ -1589,6 +1589,12 @@ Placeholder
 
 <!-- ===================================================================== -->
  <section title="Time Synchronization">
+  <t>
+   Editor's Note: A detailed discussion of time synchronization is outside the 
+   scope of this document, and the production of a specialist
+   text discussing this topic is encouraged. This section will be updated
+   if such a documents is available before publication of this text.
+  </t>
   <t> 
    Time synchronization is important both from the perspective of 
    operating the DetNet network itself and from the perspective of 
@@ -1609,7 +1615,7 @@ Placeholder
    wider application than basic time transfer in a DetNet.
   </t>
   <t>
-   Further discussion of time synchronization is outside
+   A more detailed discussion of time synchronization is outside
    the scope of this document.
   </t>
  </section>
