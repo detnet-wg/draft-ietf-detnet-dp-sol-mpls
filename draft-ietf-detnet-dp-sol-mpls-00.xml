@@ -1654,10 +1654,49 @@ Placeholder
   </section>
   <section title="Explicit routes">
    <t>
-    [Editor's note: Outdated.. and needs more work.]		 
+    It is necessary to consider explicit routes both at the DetNet layer and in the MPLS layer.
+    In the DetNet layer the explicit route consists of the set of Relay Nodes that the 
+    DetNet flow must traverse. In the MPLS layer the explicit route consists of the set
+    of LSRs, links, and possibly link bundle members and queues that the DetNet packets of a flow 
+    must traverse between nodes in the DetNet layer (i.e. between a specific Edge Node and 
+    the next hop Relay Node, between specific Relay Nodes, and between a specific Relay node and 
+    the egress Edge Node. This detailed steering is needed to ensure that packets are routed through
+    the resources that have been reserved for them, and hence provide the DetNet application
+    with the required performance.
    </t>
    <t>
-    [TBD: based on MPLS TE and possibly IPv6 SR]
+    Whether configuring, calculating and instantiating this is a multi-stage process, or a 
+    single stage process is out of scope of this document.
+   </t>
+   <t>
+    The one method of explicitly setting up the explicit path at the DetNet layer
+    is through the use of the management controller.
+   </t>
+   <t>
+    Editor's note a method of seting up a graph through the DetNet Nodes using the IGP
+    has been proposed, but at the time of writing I (Stewart) have forgotten the 
+    reference.
+   </t>
+   <t>
+    There are a number of approaches that can be taken to provide
+    explicit routes/paths in the MPLS layer:
+    <list style="symbols">
+     <t>
+      The path can be explicitly set up by the managemement controller calculating the path and
+      explicitly configuring each node along that path. 
+     </t>
+     <t>
+      The LSP can be set up using RSVP-TE. Such an approach confines the packet
+      to the explicit path.
+     </t>
+     <t>
+      The path can be implimented using segment routing.
+     </t>
+    </list>
+   </t>
+   <t>
+    Where the DetNet traffic is carried over IP <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>
+    explicit paths may need to be provided in the IP layer. This is for further study.
    </t>
   </section>
  </section>
