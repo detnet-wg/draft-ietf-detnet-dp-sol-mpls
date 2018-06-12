@@ -1977,6 +1977,16 @@ Placeholder
    <?rfc include="reference.RFC.8040"?>
    &I-D.ietf-detnet-dp-alt;
    &I-D.ietf-detnet-architecture;
+   <reference anchor='I-D.ietf-detnet-dp-sol-ip'>
+     <front>
+       <title>DetNet IP Data Plane Encapsulation
+       </title>
+       <author>
+         <organization>Korhonen, J., Varga, B.</organization>
+       </author>
+       <date year='2018' />
+     </front>
+   </reference>
    &rfc8169;
 
    <reference anchor='I-D.sdt-detnet-security'>
