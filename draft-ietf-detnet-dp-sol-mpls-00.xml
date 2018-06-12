@@ -388,26 +388,56 @@ System  |    +--------+       +--------+       +--------+   | System
  <figure align="center" anchor="fig_mpls_example"
   title="Example Packet flow in DetNet Enabled MPLS Network">
  <artwork><![CDATA[
-   1111   11111111  111111   222222   2222222     333
-CE1----EN1--------R1-------R2-------R3--------EN2----CE2
-         \2          22222/                 3 /
-          \2222222  /----+                 3 /
+   1      1.1       1.1      1.2.1    1.2.1      1.2.2
+CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
+         \           1.2.1 /                   /
+          \1.2     /-----+                   /
            +------R4------------------------+
-                    333333333333333333333333
+                     1.2.2 
  ]]></artwork>
  </figure>
 
  <t>
-   Customer Equipment CE1 sends a packet into the DetNet enabled MPLS
-   network.  Edge Node EN1 makes a copy of the packet and encapsulates
-   each copy as a DetNet packet (packet 1 and packet 2).  It sends one
-   copy (1) to Relay Node R1 and the other copy (2) to Relay Node R4.
-   R1 sends packet copy 1 to R2.  R4 sends one copy to R2, and a further
-   copy (3) to EN2.  R2 receives copy (2) before copy 1, and so
-   eliminated copy (1) sending only (2) to EN2.  EN2 receives copy (3)
-   first sending it to CE2 and eliminating copy (2).  Note the number
-   illustrates the replication instance and should not be confused with
-   the sequence number which remains unchanged in all packet copies.
+  In <xref target="fig_mpls_example"/> the numbers are used 
+  to identify the instance of a packet. Packet 1 is the original packet, 
+  and packets 1.1, and 1.2 are two first generation copies of packet 1. 
+  Packet 1.2.1 is a second generation copy of packet 1.2 etc.
+  Note that these numbers never appear in the packet, and are not
+  to be confused with sequence numbers, labels or any other
+  identifier that appears in the packet. They simply indicate the
+  generation number of the original packet so that its passage
+  through the network fragment can be identified to the reader.
+ </t>
+ <t>
+  Customer Equipment CE1 sends a packet into the DetNet enabled MPLS
+  network. This is packet (1).  Edge Node EN1 encapsulates the
+  packet as a DetNet Packet and sends it to Relay node R1 (packet 1.1).
+  EN1 makes a copy of the packet (1.2), encapsulates it and 
+  sends this copy to Relay node R4.
+ </t>
+ <t>
+  Note that along the MPLS path from EN1 to R1 there may be
+  zero or more LSRs which, for clarity, are not shown. The same is true
+  for any other path between two DetNet entities shown in 
+  <xref target="fig_mpls_example"/>.
+ </t>
+ <t>
+  Relay node R4 has been configured to send one copy of the packet to
+  Relay Node R2 (packet 1.2.1) and one copy to Edge Node EN2 
+  (packet 1.2.2).
+ </t>
+ <t>
+  R2 receives packet copy 1.2.1 before packet copy 1.1 arrives, and, having
+  been configured to perform packet elimination on this DetNet flow, 
+  forwards packet 1.2.1 to Relay Node R3. 
+  Packet copy 1.1 is of no further use and so is discarded by R2.
+ </t>
+ <t>
+  Edge Node EN2 receives packet copy 1.2.2 from R4 before it receives
+  packet copy 1.2.1 from R2 via relay Node R3. EN2 therefore strips
+  any DetNet encapsulation from packet copy 1.2.2 and forwards the
+  packet to CE2. When EN2 receives the later packet copy 1.2.1 this
+  is discarded. 
  </t>
  <t>
    The above is of course illustrative of many network scenarios that
