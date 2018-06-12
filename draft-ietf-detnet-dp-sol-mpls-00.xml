@@ -192,7 +192,7 @@ LB: General comments:
 
     <t hangText="PROF">
      A Packet Reorder Function (PROF) re-orders packets within a DetNet flow  that are received out of order.
-     This function may be implemented at an edge node or end system.
+     This function may be implemented at an edge or relay node.
     </t>
     
     <t hangText="DetNet Control Word">
