@@ -324,8 +324,8 @@ LB: General comments:
   
   <t>
    <xref target="fig_8021_detnet"/> illustrates how DetNet can provide services for IEEE 802.1TSN
-   end systems over a DetNet enabled network.  The edge nodes insert and remove required DetNet data
-   plane encapsulation.  The 'X' in the edge and relay nodes represents a potential DetNet flow
+   end systems, CE1 and CE2, over a DetNet enabled network.  The edge nodes, E1 and E2, insert and remove required DetNet data
+   plane encapsulation.  The 'X' in the edge nodes and relay node, R1, represent a potential DetNet flow
    packet replication and elimination point.  This conceptually parallels L2VPN services, and could
    leverage existing related solutions as discussed below.
   </t>
@@ -343,10 +343,13 @@ System |    +--------+       +--------+       +--------+   |  System
 |CE1|  |    |    \   |       |   X    |       |   /    |   |   |CE2|
 |   |       |     \_.|..DF2..|._/ \_..|..DF4..|._/     |       |   |
 +---+       |        |=======|        |=======|        |       +---+
-    ^       +--------        +--------+       +--------+       ^
-    |        Edge Node       Relay Node       Edge Node        |
-    |                                                             |
-    |<----- Emulated Time Sensitive Networking (TSN) Service ---->|
+    ^       +--------+       +--------+       +--------+       ^
+    |        Edge Node       Relay Node        Edge Node       |
+    |          (T-PE)           (S-PE)          (T-PE)         |
+    |                                                          |
+    |<--TSN-->     <---- TSN Over DetNet MPLS ---->   <--TSN-->|
+    |                                                          |
+    |<--- Emulated Time Sensitive Networking (TSN) Service --->|
 
     DFx = DetNet Flow x
 
@@ -355,10 +358,11 @@ System |    +--------+       +--------+       +--------+   |  System
 </figure>
 
  <t>
-  <xref target="fig_pw_detnet"/> illustrates how end to end MPLS-based DetNet
-  service is provided in a more detail.  In this case, the end systems are able
-  to send and receive DetNet flows.  For example, an end system sends data
-  encapsulated in MPLS.  The 'X' in the end systems, edge and relay nodes
+  <xref target="fig_pw_detnet"/> illustrates how an end to end MPLS-based DetNet
+  service is provided in a more detail.  In this case, the end systems, CE1 and CE2, are able
+  to send and receive DetNet flows, and R1 and R2 are relay nodes as
+  they sit in the middle of a DetNet network.  For example, an end system sends data
+  encapsulated in MPLS.  The 'X' in the end systems, and relay nodes
   represents potential DetNet flow packet replication and elimination points.
   Here the relay nodes may change the underlying transport, for example
   tunneling MPLS over IP <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>, or simply interconnect
@@ -368,8 +372,8 @@ System |    +--------+       +--------+       +--------+   |  System
 <figure align="center" anchor="fig_pw_detnet"
  title="MPLS-Based Native DetNet">
 <artwork><![CDATA[
-      DetNet                                             DetNet
-      Service          Transit          Transit          Service
+      DetNet                                           DetNet
+MPLS  Service          Transit          Transit       Service MPLS
 DetNet  |             |<-Tnl->|        |<-Tnl->|            | DetNet
 End     |             V   1   V        V   2   V            | End
 System  |    +--------+       +--------+       +--------+   | System
@@ -380,23 +384,28 @@ System  |    +--------+       +--------+       +--------+   | System
 +---+        |        |=======|        |=======|        |      +---+
     ^        +--------+       +--------+       +--------+      ^
     |        Relay Node       Relay Node       Relay Node      |
+    |          (S-PE)           (S-PE)           (S-PE)        |
+    |                                                          |
+    |<---------------------- DetNet MPLS --------------------->|
     |                                                          |
     |<--------------- End to End DetNet Service -------------->|
 ]]></artwork>
 </figure>
 
  <t>
-  <xref target="fig_pw_detnet2"/> illustrates how end to end MPLS-based DetNet
-  service is provided where the end systems is NOT able to send and receive MPLS 
-  encapsulated DetNet flows.
+  <xref target="fig_pw_detnet2"/> illustrates how an end to end MPLS-based DetNet
+  service is provided where the end systems are not able to send and receive
+  DetNet flows. In this example, the nodes labeled CE1 and CE2 could be
+  non-DetNet aware IP routers or hosts. Note that E1 and E2 are edge
+  nodes as they sit boundaries of the DetNet enabled domain.
  </t>
   
 <figure align="center" anchor="fig_pw_detnet2"
  title="MPLS-Based DetNet (non-MPLS End System)">
 <artwork><![CDATA[
-      DetNet                                             DetNet
-      Service          Transit          Transit          Service
-DetNet (AC)           |<-Tnl->|        |<-Tnl->|         (AC) DetNet
+      IP                                              IP
+Non   Service          Transit          Transit       Service Non
+DetNet                |<-Tnl->|        |<-Tnl->|              DetNet
 End     |             V   1   V        V   2   V            | End
 System  |    +--------+       +--------+       +--------+   | System
 +---+   |    |   E1   |=======|   R2   |=======|   E3   |   |  +---+
@@ -405,9 +414,44 @@ System  |    +--------+       +--------+       +--------+   | System
 |   |   |    |     \_.|..DF2..|._/ \__.|..DF4..|._/     |   |  |   |
 +---+        |        |=======|        |=======|        |      +---+
              +--------+       +--------+       +--------+       
-             ^ Edge Node      Relay Node       Edge Node^      
+             ^ Edge Node      Relay Node       Edge Node^
+             | (T-PE)           (S-PE)          (T-PE)  |
+             |                                          |
+     <--IP-->|    <----- IP Over DetNet MPLS ---->      |<--IP-->
              |                                          |
              |<------ End to End DetNet Service ------->|
+]]></artwork>
+</figure>
+
+ <t>
+  <xref target="fig_ip_pw_detnet"/> illustrates how end to end DetNet
+  service is provided where the end systems are able to send and receive
+  IP DetNet flows, e.g., per <xref target="I-D.ietf-detnet-dp-sol-ip"/>, and
+  the MPLS  nodes optionally provide service protection. In this
+  case R1 and R3 are T-PEs and R2 is an S-PE and the DetNet service is
+  end-to-end.
+ </t>
+
+<figure align="center" anchor="fig_ip_pw_detnet"
+ title="DetNet IP over DetNet MPLS">
+<artwork><![CDATA[
+      DetNet                                           DetNet
+IP    Service          Transit          Transit       Service IP
+DetNet                |<-Tnl->|        |<-Tnl->|              DetNet
+End     |             V   1   V        V   2   V            | End
+System  |    +--------+       +--------+       +--------+   | System
++---+   |    |   R1   |=======|   R2   |=======|   R3   |   |  +---+
+|   |--------|._X_....|..DF1..|.__ ___.|..DF3..|...._X_.|------|   |
+|CE1|   |    |    \   |       |   X    |       |   /    |   |  |CE2|
+|   |   |    |     \_.|..DF2..|._/ \__.|..DF4..|._/     |   |  |   |
++---+        |        |=======|        |=======|        |      +---+
+    ^        +--------+       +--------+       +--------+      ^
+    |        Relay Node       Relay Node       Relay Node      |
+    |          (T-PE)           (S-PE)          (T-PE)         |
+    |                                                          |
+    |<-DN IP->       <------ DetNet MPLS ------>      <-DN IP->|
+    |                                                          |
+    |<--------------- End to End DetNet Service -------------->|
 ]]></artwork>
 </figure>
 
