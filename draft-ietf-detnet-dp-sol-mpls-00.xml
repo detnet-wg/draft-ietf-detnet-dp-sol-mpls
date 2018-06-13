@@ -236,41 +236,72 @@ LB: General comments:
 
  <section title="Requirements language">
   <t>
-   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
-   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
-   and "OPTIONAL" in this document are to be interpreted as
-   described in <xref target="RFC2119"/>.
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+    "OPTIONAL" in this document are to be interpreted as described in
+    BCP 14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and
+    only when, they appear in all capitals, as shown here.
   </t>
  </section>
 
- <section title="DetNet data plane overview" anchor="sec_dt_dp">
+ <section title="MPLS DetNet data plane overview" anchor="sec_dt_dp">
   <t>
-   This document describes how to carry DetNet flows over MPLS and over MPLS over IP. 
-   Two different cases are covered: (i) the
-   inter-connect scenario, in which IEEE802.1 TSN is routed over a layer-3 network (i.e., to enlarge
-   the layer-2 domain), and (ii) native connectivity between DetNet-aware end systems.
+    This document describes how DetNet flows are carried over MPLS
+    networks. The DetNet Architecture, <xref
+    target="I-D.ietf-detnet-architecture"/>, decomposes the DetNet data
+    plane into two layers: a service layer and a transport layer.  The
+    basic approach defined in this document supports the DetNet service
+    layer based on existing pseudowire (PW) encapsulations and
+    mechanisms, and supports the DetNet transport layer based on
+    existing MPLS Traffic Engineering encapsulations and mechanisms.
+    Background on PWs can be found in <xref target="RFC3985"/> and <xref
+    target="RFC3031"/>.
   </t>
+  <figure anchor="dn_mpls_dp_approach" align="center"
+          title="DetNet adaptation to MPLS data plane">
+    <artwork align="center"><![CDATA[
+  DetNet        MPLS
+    .
+    .
++-----------+
+|  Service  | d-CW, S-Label
++-----------+
+| Transport | T-Label(s)
++-----------+
+    .
+    .
+]]></artwork>
+</figure>
+
   <t>
-   [Editor's note: these two scenarios does not cover all the defined use-cases.]
+    The MPLS DetNet data plane approach defined in this document is
+    shown in <xref target="dn_mpls_dp_approach"/>.  The service layer is
+    supported by a DetNet control word (d-CW) which conforms to the
+    Generic PW MPLS Control Word (PWMCW) defined in <xref
+    target="RFC4385"/>.  A d-CW identifying service label (S-Label) is
+    also used. The transport layer is supported by one or labels (T-Labels).
   </t>
   <!-- imported text from draft-bryant-detnet-mpls-dp-00.txt -->
 
   <t>
-  TSN End Systems send and receive packets over the DetNet.  The supported
-  packet types are IP and Ethernet.
-  </t>
-  <t>
-   Edge Nodes are responsible for the imposition and disposition of the required
+    DetNet node types are defined in <xref
+    target="I-D.ietf-detnet-architecture"/>.  DetNet
+   Edge Nodes sit at the boundary of a DetNet domain. They are responsible for
+   mapping non-DetNet aware traffic to DetNet services.  They also support
+   the imposition and disposition of the required
    DetNet encapsulation.  These are functionally similar to pseudowire (PW)
    Terminating Provide Edge (T-PE) equipment.
   </t>
   <t>
-   Relay nodes are strategically placed and used to enhance the reliability
+   Relay nodes are strategically placed within a DetNet domain and are used to enhance the reliability
    of delivery by enabling the replication of packets so that multiple
    copies, possibly over multiple paths are forwarded through the DetNet domain.  They also reduce the impact of
    replication by the eliminating surplus copies of DetNet packets.
+   Relay nodes may sit the boundary of an MPLS domain when the non-MPLS
+   domain is DetNet aware.
    Replication and elimination may also be performed at ingress and
-   egress edge nodes.
+   egress edge nodes respectively. Relay nodes are functionally similar
+   to PW S-PEs or, when at the edge of an MPLS network, T-PEs.
   </t>
   <t>
    Edge nodes, and relay nodes are aware of the needs of particular
@@ -279,13 +310,15 @@ LB: General comments:
   </t>
   <t>
    Transit nodes are normal MPLS Label Switching Routers (LSRs).  They
-   are unaware of the special requirements of DetNet flows, although
-   they have to be configureable to provide traffic engineering services and proper QoS to
-   them to enhance the prospect of them meeting the required service
-   level agreement (SLA).
+   are generally unaware of the special requirements of DetNet flows, although
+   they need to provide traffic engineering services and proper QoS to
+   the LSPs associated with DetNet flows to enhance the prospect of the
+   LSPs meeting the DetNet service requirements. Some implementations of
+   transit nodes may be DetNet aware, but such nodes just support the DetNet
+   transport layer.
   </t>
   <t>
-   The MPLS LSP may be provided by any MPLS method (LSP, RSVP-TE, MPLS-
+   The MPLS LSP may be provided by any MPLS method (provisioned, RSVP-TE, MPLS-
    TP, or MPLS Segment Routing (SR)).
   </t>
   
@@ -1995,6 +2028,7 @@ Placeholder
    <?rfc include="reference.RFC.6003"?>
    &rfc4385;
    &rfc7510;
+   <?rfc include="reference.RFC.8174"?>
    &I-D.ietf-spring-segment-routing-mpls;
   </references>
   <references title="Informative references">
