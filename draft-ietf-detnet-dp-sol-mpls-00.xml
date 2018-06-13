@@ -328,9 +328,7 @@ System |    +--------+       +--------+       +--------+   |  System
   encapsulated in MPLS.  The 'X' in the end systems, edge and relay nodes
   represents potential DetNet flow packet replication and elimination points.
   Here the relay nodes may change the underlying transport, for example
-  tunneling MPLS over IP [draft-xu-mpls-sr-over-ip]
-  [Editor note: SR is not mandatory, why to refer to this draft?], 
-  or simply interconnect
+  tunneling MPLS over IP <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>, or simply interconnect
   network segments.
  </t> 
   
@@ -531,7 +529,7 @@ CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
    relay node and end system packet processing. The PROF MAY be enabled in a
    DetNet node. The PROF relies on the  presence of sequence numbers in a DetNet
    (compound) flows. The PROF is only applied to DetNet flows that are identified
-   by the S-Label as requiring this function. 
+   by the service (S-Label) as requiring this function. 
   </t>
   <t>
    Editors note: I cannot remember what we concluded about the following. We can remove
@@ -722,11 +720,12 @@ Examples
  <section title="DetNet Routing Service (IP over MPLS)" anchor="detrouting">
 
   <t> 
-   DetNet Routing service provides routing. Forwarding over the DetNet domain is
-   based on L3 (IP) addresses (i.e. dst-IP). 
-   In case of an MPLS PSN at the ingress/egress (i.e., PE nodes of DetNet
-   domain) the IP packets are encapsulated in MPLS. The data-flow IP header MUST
-   be preserved as-is. 
+   IP traffic and IP DetNet flows, see <xref
+   target="I-D.ietf-detnet-dp-sol-ip"/>, can be carried over a DetNet
+   MPLS domain.  In such cases, the IP headers are modified per standard
+   router behavior, e.g., TTL handling. The figure below shows the
+   encapsulation of an IP flow over MPLS as well as when MPLS is carried
+   over an IP PSN, see <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>.
   </t>
 
   <figure title="Encapsulation format for DetNet Routing in MPLS PSN for L3 end-systems" anchor="fig_mpls_DN_routing">
@@ -787,7 +786,7 @@ Examples
  
   <t> DN-IWF may ensure that flow attributes are correlated across segment borders. For example,
   there are two DetNet functions which require Sequence Numbers: (1) PEF: removes duplications
-  from flows and (2) PROF: ensures in-order-delivery of packet in a flow. Stitching flows together
+  from flows and (2) IoD: ensures in-order-delivery of packet in a flow. Stitching flows together
   and correlating attributes means for example that replication of packets can happen in one segment
   and elimination of duplicates in a different one.   </t>
 
@@ -830,7 +829,11 @@ Examples
   <t> For the Flow-ID the DN-IWF can implement a static mapping. The situation is more complicated for Sequence Number as it is different packet-by-packet, so it may need more sophisticated translation unless its format is exactly the same in the two technology segments. In this later case the DN-IWF can simple copy the Sequence Number field between the tunneling encapsulation of the two technology segments.  
   </t>  
   
-  <t> In case of three technology segments (IP, MPLS and TSN) three DN-IWF functions can be specified. In the rest of this section the focus is on the (1) IP - MPLS network scenario. Note: the use-cases are out-of-scope for (2) TSN - IP, (3) TSN - MPLS. Note2: in current discussions the DetNet Sequence Number has an incompatible format with TSN (defines 16 bits only).
+  <t> In case of three technology segments (IP, MPLS and TSN) three DN-IWF functions can be specified. In the rest of this section the focus is on the (1) IP - MPLS network scenario. Note: the use-cases are out-of-scope for (2) TSN - IP, (3) TSN - MPLS. 
+  </t>  
+  
+  <t>
+    [Note2: in current discussions the DetNet Sequence Number has an incompatible format with TSN (defines 16 bits only).]
   </t>
 
   <t> Simplest implementation of DN-IWF is provided if the flow attributes have the same format. Such a common denominator of the tunnel encapsulation format is the pseudowire encapsulation over both IP and MPLS.
@@ -1023,8 +1026,8 @@ Placeholder
     The only nodes that needs to know the payload type of a flow are the
     DetNet ingress node and the DetNet egress nodes.  The ingress node
     has to know how to process the packet it receives from the ingress
-    AC, and egress edge node has to know how to prepare the packet for
-    transmission on the egress AC.
+    AC or IP flow, and the egress edge node has to know how to prepare the
+    packet for transmission to the next hop.
    </t>	   
    <t>
     On ingress a DetNet edge node has to classify the packets into those
@@ -1034,24 +1037,18 @@ Placeholder
     value of the S-label.  Thus, when the egress edge node looks up the
     S-label one of the parameters returned is the packet type which in
     turn tells the egress edge node how to prepare the packet for
-    transmission over the egress AC.
+    transmission to a next hop.
    </t>
    <t>
     The consequence of this approach is that if multiple packet
-    encapsulations are processed on a node, each will need its own
-    S-Label.  That is not generally a problem, since it is anticipated
-    that only one encapsulation type intended for carriage as a DetNet
-    flow will be present on any egress.  However, IPv4 and IPv6 have
-    different forwarding equivalence classes (FEC) in MPLS and are
-    therefore allocated different labels rather than being distinguished
-    through the IP version field in the IP header.  Futhermore IPv4 and
-    IPv6 when running directly over Ethernet are identified via the
-    Ethertype rather than via the IP version number.  Whilst it ought to
-    be safe to identify the IP type though the IP version number the
-    absence this approach in practical applications suggests that it is
-    more conservative to distinguish between IP types through the
-    S-Label.  Thus when the payload is IP, two S-Labels are used, one to
-    identify an IPv4 payload and one to identify an IPv6 payload.
+    encapsulations are processed on a node pair, each encapsulation will need its own
+    S-Label.  That is not generally a problems, since it is anticipated
+    that only one encapsulation type will be present for each DetNet flow.
+    Of course, if for some reason the multiple encapsulations are needed
+    to support a single DetNet service, multiple S-labels will be
+    required for that service.  Note that in the unlikely case that Ipv4
+    and IPv6 will map to the same DetNet flow, different S-labels will be
+    needed to differentiate between the versions of IP.
    </t>
   </section>
 
@@ -1227,8 +1224,11 @@ Placeholder
 
  <section title="Service Layer Considerations">
    <t>
-    The edge and relay node internal procedures of the PROEF are implementation specific.  The order
-    of a packet elimination or replication is out of scope in this specification. However, care
+    The edge and relay node internal procedures related to PROEF are implementation specific.  The order
+    of a packet elimination or replication is out of scope in this specification. 
+    <!-- LB: I'm not sure why the following text belongs in this
+         document, propose dropping as I think it will just lead to confusion -->
+    However, care
     should be taken that the replication function does not actually loopback packets as "replicas".
     Looped back packets include artificial delay when the node that originally initiated the packet
     receives it again. Also, looped back packets may make the network condition to look healthier
