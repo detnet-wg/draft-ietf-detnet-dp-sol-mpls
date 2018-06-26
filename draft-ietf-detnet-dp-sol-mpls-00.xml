@@ -283,30 +283,37 @@ LB: General comments:
   </t>
   <!-- imported text from draft-bryant-detnet-mpls-dp-00.txt -->
 
+<figure anchor="fig_tsn_mpls_detnet" align="center"
+title="A TSN over DetNet MPLS Enabled Network">
+<artwork align="center"><![CDATA[
+TSN             Edge          Transit         Edge         TSN
+End System      Node            Node          Node         End System
+                (T-PE)         (LSR)          (T-PE)
+
++---------+   +.........+                   +.........+   +---------+
+|  Appl.  |<--:Svc Proxy:--End to End Svc.--:Svc Proxy:-->|  Appl.  |
++---------+   +---------+                   +---------+   +---------+
+|   TSN   |   |TSN| |Svc|<-- DetNet flow -->: Service :-->|   TSN   |
++---------+   +---+ +---+    +---------+    +---------+   +---------+
+|Transport|   |Trp| |Trp|    |Transport|    |Trp| |Trp|   |Transport|
++-------.-+   +--.+ +-.-+    +--.----.-+    +-.-+ +-.-+   +---.-----+
+        :  Link  :    /  ,-----.  \   :  Link  :    /  ,-----.  \
+        +........+    +-[  Sub  ]-+   +........+    +-[  Sub  ]-+
+                        [Network]                     [Network] 
+                         `-----'                       `-----'
+
+        |<- TSN ->|   |<----- DetNet MPLS ---->|    |<-- TSN --->|
+]]></artwork>
+</figure>
+
   <t>
-    DetNet node types are defined in <xref
-    target="I-D.ietf-detnet-architecture"/>.  DetNet
+   <xref target="fig_tsn_mpls_detnet"/> shows several node types defined in <xref
+   target="I-D.ietf-detnet-architecture"/>.  DetNet
    Edge Nodes sit at the boundary of a DetNet domain. They are responsible for
    mapping non-DetNet aware traffic to DetNet services.  They also support
    the imposition and disposition of the required
    DetNet encapsulation.  These are functionally similar to pseudowire (PW)
-   Terminating Provide Edge (T-PE) equipment.
-  </t>
-  <t>
-   Relay nodes are strategically placed within a DetNet domain and are used to enhance the reliability
-   of delivery by enabling the replication of packets so that multiple
-   copies, possibly over multiple paths are forwarded through the DetNet domain.  They also reduce the impact of
-   replication by the eliminating surplus copies of DetNet packets.
-   Relay nodes may sit the boundary of an MPLS domain when the non-MPLS
-   domain is DetNet aware.
-   Replication and elimination may also be performed at ingress and
-   egress edge nodes respectively. Relay nodes are functionally similar
-   to PW S-PEs or, when at the edge of an MPLS network, T-PEs.
-  </t>
-  <t>
-   Edge nodes, and relay nodes are aware of the needs of particular
-   DetNet flows and take care to process them in accordance with the
-   required performance needs.
+   Terminating Provide Edge (T-PE) nodes which use MPLS TE LSPs.
   </t>
   <t>
    Transit nodes are normal MPLS Label Switching Routers (LSRs).  They
@@ -321,7 +328,43 @@ LB: General comments:
    The MPLS LSP may be provided by any MPLS method (provisioned, RSVP-TE, MPLS-
    TP, or MPLS Segment Routing (SR)).
   </t>
-  
+  <figure align="center" anchor="fig_ip_mpls_detnet"
+          title="DetNet IP Over MPLS Network">
+    <artwork><![CDATA[
+IP  DetNet       Relay          Transit       Relay       IP DetNet
+End System       Node            Node         Node        End System
+                 (T-PE)          (LSR)        (T-PE)
++---------+                                               +---------+
+|  Appl.  |<--------------- End to End Service ---------->|  Appl.  |
++---------+    .....-----+                  +-----.....   +---------+
+| Service |<---: Service |-- DetNet flow ---| Service :-->| Service |
++---------+    +---------+   +---------+    +---------+   +---------+
+|Transport|    |Trp| |Trp|   |Transport|    |Trp| |Trp|   |Transport|
++-------.-+    +-.-+ +-.-+   +---.---.-+    +-.-+ +-.-+   +---.-----+
+        :  Link  :    /  ,-----.  \  :  Link  :    /  ,-----.  \
+        +........+    +-[  Sub  ]-+  +........+    +-[  Sub  ]-+
+                        [Network]                    [Network]
+                         `-----'                      `-----'
+
+        |<-DN IP->|   |<---- DetNet MPLS ---->|      |<-DN IP->|
+        ]]></artwork>
+  </figure>
+  <t>
+   <xref target="fig_ip_mpls_detnet"/> and <xref
+   target="fig_8021_detnet"/>, show different cases where relay nodes
+   may be used.  Relay nodes are similar to edge nodes in that both are
+   aware of the needs of particular DetNet flows and take care to
+   process them in accordance with the required performance needs.  They
+   differ in that relay nodes sit within a DetNet domain while edge
+   nodes always sit at DetNet domain boundaries.  Both node types can
+   enhance the reliability of delivery by enabling the replication of
+   packets so that multiple copies, possibly over multiple paths are
+   forwarded through the DetNet domain.  They also reduce the impact of
+   replication by eliminating surplus copies of DetNet packets.  Relay
+   nodes may sit the boundary of an MPLS domain when the non-MPLS domain
+   is DetNet aware. Relay nodes are functionally similar to PW S-PEs or,
+   when at the edge of an MPLS network, T-PEs.
+  </t>
   <t>
    <xref target="fig_8021_detnet"/> illustrates how DetNet can provide services for IEEE 802.1TSN
    end systems, CE1 and CE2, over a DetNet enabled network.  The edge nodes, E1 and E2, insert and remove required DetNet data
