@@ -57,9 +57,6 @@
 ]>
 <!--
 LB: General comments:
-- The document changes the definition of PREF from what is defined in
-  the architecture.  If the change to PEF/PRF/PROEF/PROF terminology is
-  to kept the change should be made to the architecture document.
 - The document is really short on RFC2119 language.  The
   narrative/informative text needs to be clearly delineated from the
   conformance related requirements.
@@ -146,7 +143,7 @@ LB: General comments:
   <t>
    Furthermore, this document also describes how DetNet flows are identified, and how a DetNet
    Relay/Edge/Transit nodes works. It also describes the function and operation of the Packet Replication (PRF)
-   Packet Elimination (PEF) and Packet Reordering (PROF) functions in the MPLS data plane.
+   Packet Elimination (PEF) and Packet Reordering (POF) functions in the MPLS data plane.
   </t>
   <t>
    This document does not define the associated control plane functions, or Operations,
@@ -181,18 +178,22 @@ LB: General comments:
     </t>
 
     <t hangText="PRF">
-     A Packet Replication Function (PRF) replicates DetNet flow packets in an edge or a relay
-     node and forwards them to one or more next hops in the DetNet domain. The number of packet copies sent 
-     to each next hop is a DetNet Flow specific parameter at the node doing the replication.
+      A Packet Replication Function (PRF) replicates DetNet flow packets
+      and forwards them to one or more next hops in the DetNet domain.
+      The number of packet copies sent to each next hop is a DetNet flow
+      specific parameter at the node doing the replication.  PRF can be
+      implemented by an edge node, a relay node, or an end system.
     </t>
 
-    <t hangText="PROEF">
-     Collective name for Packet Replication, Re-order and Elimination Functions.
+    <t hangText="PREOF">
+      Collective name for Packet Replication, Elimination, and
+      Ordering Functions.
     </t>
 
-    <t hangText="PROF">
-     A Packet Reorder Function (PROF) re-orders packets within a DetNet flow  that are received out of order.
-     This function may be implemented at an edge or a relay node.
+    <t hangText="POF">
+     A Packet Ordering Function (POF) re-orders packets within a DetNet
+     flow that are received out of order.  This function can be
+     implemented by an edge node, a relay node, or an end system.
     </t>
     
     <t hangText="DetNet Control Word">
@@ -221,10 +222,8 @@ LB: General comments:
     <t hangText="NSP">Native Service Processing.</t>
     <t hangText="OAM">Operations, Administration, and Maintenance.</t>
     <t hangText="PE">Provider Edge.</t>
-    <t hangText="PEF">Packet Elimination Function.</t>
-    <t hangText="PRF">Packet Replication Function.</t>
-    <t hangText="PROEF">Packet Replication, Reodering and Elimination Functions.</t>
-    <t hangText="PROF">Packet Reorder Function.</t>
+    <t hangText="PREOF">Packet Replication, Elimination, and Ordering
+    Functions.</t>
     <t hangText="PSN">Packet Switched Network.</t>
     <t hangText="PW">PseudoWire.</t>
     <t hangText="QoS">Quality of Service.</t>
@@ -645,10 +644,10 @@ CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
    <t>
      [LB: this paragraph belongs in the architecture document.>
 
-   DetNet service layer introduces packet reordering functionality (PROF) for use in DetNet edge and
-   relay node and end system packet processing. The PROF MAY be enabled in a
-   DetNet node. The PROF relies on the  presence of sequence numbers in a DetNet
-   (compound) flows. The PROF is only applied to DetNet flows that are identified
+   DetNet service layer introduces packet reordering functionality (POF) for use in DetNet edge and
+   relay node and end system packet processing. The POF MAY be enabled in a
+   DetNet node. The POF relies on the  presence of sequence numbers in a DetNet
+   (compound) flows. The POF is only applied to DetNet flows that are identified
    by the service (S-Label) as requiring this function. 
   </t>
   <t>
@@ -1296,7 +1295,7 @@ Placeholder
 
     <t>
      Both the Aggregation (A) label and the S-label have their MPLS S bit
-     set indicating bottom of stack, and the d-CW allows the PROEF
+     set indicating bottom of stack, and the d-CW allows the PREOF
      to work.
     </t>
     <t>
@@ -1313,7 +1312,7 @@ Placeholder
     Another approach would be not to include a d-CW for the aggregated flow.
     This would be functionally similar to aggregation at the transport layer
     using H-LSPs, but would confine knowledge of the aggregation to the 
-    DetNet layer. Such an approach shares the disadvantage that PROEF
+    DetNet layer. Such an approach shares the disadvantage that PREOF
     operations would not be possible. OAM operation in this mode is 
     for further study.
    </t>
@@ -1344,7 +1343,7 @@ Placeholder
 
  <section title="Service Layer Considerations">
    <t>
-    The edge and relay node internal procedures related to PROEF are implementation specific.  The order
+    The edge and relay node internal procedures related to PREOF are implementation specific.  The order
     of a packet elimination or replication is out of scope in this specification. 
     <!-- LB: I'm not sure why the following text belongs in this
          document, propose dropping as I think it will just lead to confusion -->
@@ -1382,9 +1381,9 @@ Placeholder
     </t>
     <t>
      The internal design of a relay node is out of scope of this document. However
-     the reader's attention is drawn to the need to make any PROEF state 
+     the reader's attention is drawn to the need to make any PREOF state 
      available to the packet processor(s) dealing with packets to which the 
-     PROEF functions must be applied, and to maintain that state is such as
+     PREOF functions must be applied, and to maintain that state is such as
      way that it is available to the packet processor operation on the next
      packet in the DetNet flow (which may be a duplicate, a late packet, or
      the next packet in sequence.
@@ -1403,7 +1402,7 @@ Placeholder
     </t>
     <t>
      The NSP approach is useful end to end tunnel and for for "island interconnect" 
-     scenarios. However, when there is a need to do PROEF in a middle of the network, 
+     scenarios. However, when there is a need to do PREOF in a middle of the network, 
      such plain edge to edge operation is not sufficient.
     </t>
     <t>
@@ -1598,9 +1597,9 @@ Placeholder
 
  <!-- section title="Packet replication and elimination function">
      <t>
-         [editor's note: collect details of the PROEF here. Potential topics to discuss relate to
+         [editor's note: collect details of the PREOF here. Potential topics to discuss relate to
          constraints to input packets and what the expected output is. Some examples include: the
-         input packets must have the same PW Label (in a case of PWs) to enable the PROEF, no
+         input packets must have the same PW Label (in a case of PWs) to enable the PREOF, no
          loopback for replicated packets, input and output PW labels do not need to be the same.
          Also, add text regarding native IPv6 encapsulation. There the PW label is replaced with
          source address + flow label combination, and the Control Word is replaced with the DetNet
@@ -1692,7 +1691,7 @@ Placeholder
   <t>
    [Editor's note: This section is a work in progress.
    discuss here what kind of enhancements are needed for DetNet
-   and specifically for PROEF and DetNet zero congest loss and latency
+   and specifically for PREOF and DetNet zero congest loss and latency
    control. Need to cover both traffic control (queuing) and connection
    control (control plane).]
  </t>
@@ -1782,7 +1781,7 @@ Placeholder
    [Editor's note: Outdated and at the functional level technology independent.. but needs more work.]		 
   </t>
   <t>
-   The control plane protocol solution required for managing the PROEF processing
+   The control plane protocol solution required for managing the PREOF processing
    is outside the scope of this document.
   </t>
  </section>
@@ -2181,7 +2180,7 @@ Placeholder
  <section title="Example of DetNet data plane operation" anchor="sec_comb">
   <t>
    [Editor's note: Add a simplified example of DetNet data plane and how labels etc
-   work in the case of MPLS-based PSN and utilizing PROEF. The figure is subject
+   work in the case of MPLS-based PSN and utilizing PREOF. The figure is subject
    to change depending on the further DT decisions on the label handling..]
   </t>
  </section>
