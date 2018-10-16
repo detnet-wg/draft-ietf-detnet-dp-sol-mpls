@@ -288,6 +288,16 @@ LB: General comments:
     target="RFC4385"/>.  A d-CW identifying service label (S-Label) is
     also used. The transport layer is supported by one or labels (T-Labels).
   </t>
+
+ <t>
+  A node operating on a DetNet flow in the Detnet layer, i.e. a node processing a
+  DetNet packet which has the S-label as top of stack uses the local context
+  associated with that S-label to determine what local operation(s) are 
+  applied to that packet. The S-label has to be unique on each edge and
+  relay node, which is achieved by using a label taken from the platform
+  label space <xref target="RFC3031"/>.
+ </t>
+
   </section>
 
   <section title="MPLS DetNet data plane scenarios" anchor="sec_mpls_dt_dp_scen">
@@ -428,18 +438,10 @@ System |    +--------+       +--------+       +--------+   |  System
   they sit in the middle of a DetNet network.  For example, an end system sends data
   encapsulated in MPLS.  The 'X' in the end systems, and relay nodes
   represents potential DetNet flow packet replication and elimination points.
-  Here the relay nodes may change the underlying transport, for example
+  In this figure, the relay nodes may change the underlying transport, for example
   tunneling MPLS over IP <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>, or simply interconnect
   network segments.
- </t> 
-    <t>
-     [Editor's note:  ... nodes may change the underlying transport, for example
-	 tunneling MPLS over IP, or simply interconnect network segments.
-	 Does it refer to a sub-network scenario? Why only relay nodes mentioned?
-	 Same is valid for Transit Node, see Figure 3. 
-	 ]
-    </t>
- 
+ </t>
   
 <figure align="center" anchor="fig_pw_detnet"
  title="MPLS-Based Native DetNet">
@@ -494,12 +496,6 @@ System  |    +--------+       +--------+       +--------+   | System
              |<------ End to End DetNet Service ------->|
 ]]></artwork>
 </figure>
-
-
- <t>
-    [Editor's note: What is the difference of Fig6 and Fig7 from dataplane perspective? Packets on the wire looks exactly the same. Functions of E1-R1, R2-R2 and E3-R3 are exactly the same. IP Over DetNet MPLS arrows extended beyond the 'X'.]
- </t>
-
  <t>
   <xref target="fig_ip_pw_detnet"/> illustrates how end to end DetNet
   service is provided where the end systems are able to send and receive
@@ -608,48 +604,59 @@ CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
 <!-- =================== General Encap considerations ================ -->
 <!-- ================================================================= -->
 
-<section title="DetNet MPLS encapsulation" anchor="dn-gen-encap-solution">
- 
-<section title="DetNet IP Flow Identification related requirements">
- <t>
- Two major groups of scenarios can be distinguished which require flow
- identification during transport:
- </t>
+<section title="DetNet MPLS Data Considerations" anchor="dn-gen-encap-solution">
+  <t>
+    This section provides informative considerations related to
+    providing DetNet service to flows which are identified
+    based on their header information. At a high level, the
+    following are provided on a per flow basis:
+    <list style="hanging">
+      <t hangText="Congestion protection and latency control:">
+        <vspace blankLines="1"/>
+        Usage of allocated resources (queuing, policing, shaping) to ensure
+        that the congestion-related loss and latency/jitter requirements of
+        a DetNet flow are met.
+      </t>
+      <t hangText="Explicit routes:">
+        <vspace blankLines="1"/>
+        Use of a specific path for a flow.  This limits
+        miss-ordering and latency.
+      </t>
 
- <t><list style="numbers">
-  <t>DetNet function related scenarios:
-  <list style="symbols">
-   <t>Congestion protection and latency control: usage of allocated resources (queuing, policing, shaping).</t>
-   <t>Explicit routes: select/apply the flow specific path.</t>
-   <t>Service protection: recognize DetNet compound and member flows for replication an elimination.</t>
-  </list>
- </t>
- <t>OAM function related scenarios:
-  <list style="symbols">
-   <t>troubleshooting (e.g., identify misbehaving flows, etc.)</t>
-   <t>recognize flow(s) for analytics (e.g., increase counters, etc.)</t>
-   <t>correlate events with flows (e.g., volume above threshold, etc.)</t>
-   <t>etc.</t>
-  </list>
- </t>
- </list></t>
- <t>
-  The DetNet data plane allows for the aggregation of DetNet flows, e.g., via MPLS hierarchical
+      <t hangText="Service protection:">
+        <vspace blankLines="1"/>
+        Which in the case of this document primarily relates to
+        replication and elimination. Changing the explicit path after a
+        failure is detected in order to restore delivery of the required
+        DetNet service characteristics is also possible. Path changes,
+        even in the case of failure recovery, can lead to the out of
+        order delivery of data.
+      </t>
+      <t hangText="Load sharing:">
+        <vspace blankLines="1"/>
+        Generally, distributing packets of the same DetNet flow over
+        multiple paths is not recommended. Such load sharing,
+        e.g., via ECMP or UCMP, impacts ordering and end-to-end jitter.
+      </t>
+      <t hangText="Troubleshooting:"> <vspace blankLines="1"/>
+      For example, to support identification of misbehaving flows.
+      </t>
+      <t hangText="Recognize flow(s) for analytics:"><vspace blankLines="1"/>
+      For example, increase counters.
+      </t>
+      <t hangText="Correlate events with flows:"><vspace blankLines="1"/>
+      For example, unexpected loss.
+      </t>
+    </list>
+  </t>
+
+  <t>
+  The DetNet data plane also allows for the aggregation of DetNet flows, e.g., via MPLS hierarchical
   LSPs, to improved scaling.  When DetNet flows are aggregated, transit nodes may have limited
   ability to provide service on per-flow DetNet identifiers. Therefore, identifying each individual
   DetNet flow on a transit node may not be achieved in some network scenarios, but DetNet service
   can still be assured in these scenarios through resource allocation and control.
  </t>
-
- <t>
-  A node operating on a DetNet flow in the Detnet layer, i.e. a node processing a
-  DetNet packet which has the S-label as top of stack uses the local context
-  associated with that S-label to determine what local operation(s) are 
-  applied to that packet. The S-label has to be unique on each edge and
-  relay node, which is achieved by using a label taken from the platform
-  label space <xref target="RFC3031"/>.
- </t>
- </section>
 
  <section title="End-system specific considerations">
   <t>
@@ -681,13 +688,12 @@ CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
   </t>
 
   <t> 
-   The IP end-system scenario is different. Data-flows are encapsulated directly
-   in L3 (i.e., IP) and the application may use further upper layer protocols
-   (e.g., Real-time Transport Protocol (RTP)). Many valid combinations exist, and it may be application
-   specific how the IP header fields are used. Also, usage of further upper
-   layer protocols depends on application requirements (e.g.,
-   time-stamp). <xref target="I-D.ietf-detnet-dp-sol-ip"/> does not specify any details of upper layers.
-   IP flows are identified simple by 6-tuples.
+   The IP end-system scenario is different. In this case, data-flows are
+   encapsulated directly in IP and, typically, other higher layer
+   protocols such as UDP and Real-time Transport Protocol (RTP).
+   Many valid combinations exist and it is up to applications to select
+   specific headers to be used. Details on support for DetNet IP data
+   flows can be found in <xref target="I-D.ietf-detnet-dp-sol-ip"/>.
   </t>
 
   <t>
