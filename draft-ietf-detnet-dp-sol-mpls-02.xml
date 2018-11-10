@@ -1662,7 +1662,8 @@ Examples:
   <t>
    [Editor's note: This section needs to be different for MPLS and IP solutions. Most solutions
    are technology dependant. Currently most text in this section is just a draft
-   and may have bits that are already moved to other places/documents.]		 
+   and may have bits that are already moved to other places/documents.]	
+   [Editor's note: Andy and Yuanlong will be adding text to this section.]	 
   </t>
   <t>
     While management plane and control planes are traditionally
