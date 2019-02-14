@@ -143,8 +143,8 @@ LB: General comments:
     DetNet Architecture.
   </t>
   <t>
-    The DetNet transport layer functionality that provides congestion protection
-    for DetNet flows is assumed to be in place in a DetNet node.
+    The DetNet transport layer functionality that eliminates (or
+    reduces) contention loss for DetNet flows is assumed to be in place in a DetNet node.
   </t>
   <t>
    Furthermore, this document also describes how DetNet flows are identified,
@@ -153,10 +153,11 @@ LB: General comments:
    (PEF) and Packet Ordering (POF) functions in the MPLS data plane.
   </t>
   <t>
-   This document does not define the associated control plane functions, or
-   Operations, Administration, and Maintenance (OAM).  It also does not specify
-   traffic handling capabilities required to deliver congestion protection and
-   latency control for DetNet flows at the DetNet transport layer.
+   This document does not define the associated control plane functions,
+   or Operations, Administration, and Maintenance (OAM).  While
+   requiring implementations to control contention loss and jitter of
+   DetNet flows, this document does not specify the specific mechanisms
+   needed to eliminate contention loss or reduce jitter.
   </t>
  </section>
 
@@ -618,7 +619,7 @@ CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
     based on their header information. At a high level, the
     following are provided on a per flow basis:
     <list style="hanging">
-      <t hangText="Congestion protection and latency control:">
+      <t hangText="Eliminating contention loss and jitter reduction:">
         <vspace blankLines="1"/>
         Usage of allocated resources (queuing, policing, shaping) to ensure
         that the congestion-related loss and latency/jitter requirements of
@@ -1482,23 +1483,24 @@ Examples:
      target="RFC5129"/> and updated by <xref target="RFC5462"/>.
   </t>
   <t>
-     CoS for DetNet flows carried in IPv6 is provided using the standard
-     differentiated services code point (DSCP) field <xref
-     target="RFC2474"/> and related mechanisms.  The 2-bit explicit
-     congestion notification (ECN) <xref target="RFC3168"/> field MAY
-     also be used.
-  </t>
-  <t>
     One additional consideration for DetNet nodes which support CoS
     services is that they MUST ensure that the CoS service classes do
-    not impact the congestion protection and latency control mechanisms
+    not impact the eliminating contention loss and jitter reduction mechanisms
     used to provide DetNet QoS.  This requirement is similar to
     requirement for MPLS LSRs to that CoS LSPs do not impact the
-    resources allocated to TE LSPs via <xref target="RFC3473"/>.
+    resources allocated to TE LSPs, e.g.,  via <xref target="RFC3473"/>.
   </t>
  </section>
 
  <section title="Quality of Service">
+  <t>
+   In addition to explicit routes, and packet replication and elimination, described in <xref
+   target="dn-dt-solution"/> above, DetNet provides zero congestion loss and bounded latency and
+   jitter.  As described in <xref target="I-D.ietf-detnet-architecture"/>, there are different
+   mechanisms that maybe used separately or in combination to deliver a zero congestion loss
+   service.  This includes Quality of Service (QoS) mechanisms at the MPLS layer, that may be
+   combined with the mechanisms defined by the underlying network layer such as 802.1TSN.
+  </t>
   <t>
    Quality of Service (QoS) mechanisms for flow specific traffic treatment typically includes a
    guarantee/agreement for the service, and allocation of resources to support the service.
@@ -1508,15 +1510,7 @@ Examples:
    target="RFC2205">Resource ReSerVation Protocol (RSVP)</xref> (RSVP) and RSVP-TE <xref
    target="RFC3209"/> and <xref target="RFC3473"/>.  The existing MPLS mechanisms defined to
    support CoS <xref target="RFC3270"/> can also be used to reserve resources for specific traffic
-   classes.
-  </t>
-  <t>
-   In addition to explicit routes, and packet replication and elimination, described in <xref
-   target="dn-dt-solution"/> above, DetNet provides zero congestion loss and bounded latency and
-   jitter.  As described in <xref target="I-D.ietf-detnet-architecture"/>, there are different
-   mechanisms that maybe used separately or in combination to deliver a zero congestion loss
-   service.  These mechanisms are provided by the either the MPLS or IP layers, and may be
-   combined with the mechanisms defined by the underlying network layer such as 802.1TSN.
+   classes. 
   </t>
   <t>
    A baseline set of QoS capabilities for DetNet flows carried in PWs
@@ -1534,20 +1528,21 @@ Examples:
    of flows requiring DetNet QoS.
   </t>
   <t>
-   Packets that are marked with a DetNet Class of Service value, but that have not been
-   the subject of a completed reservation, can disrupt the QoS offered to properly
+   Packets that are marked in a way that does not correspond to
+   allocated resources can disrupt the QoS offered to properly
    reserved DetNet flows by using resources allocated to the reserved flows.  Therefore,
    the network nodes of a DetNet network:
 
    <list style="symbols">
     <t>
-     MUST defend the DetNet QoS by discarding or remarking (to a non-DetNet CoS)
-     packets received that are not the subject of a completed reservation.
+     MUST defend the DetNet QoS by discarding or remarking (to an
+     allocated DetNet flow or non-competing non-DetNet flow)
+     packets received that are not the subject of a completed resource allocation.
     </t>
     <t>
-     MUST NOT use a DetNet reserved resource, e.g. a queue or shaper reserved for
-     DetNet flows, for any packet that does not carry a DetNet Class of Service
-     marker.
+     MUST NOT use a DetNet allocated resource, e.g. a queue or shaper reserved for
+     DetNet flows, for any packet that does match the corresponding
+     DetNet flow.
     </t>
    </list>
   </t>
@@ -1629,7 +1624,7 @@ Examples:
         Ensuring that the proper Ethernet VLAN tag priority and destination MAC address
         are used on a DetNet/TSN packet may require further clarification of the customary
         L2/L3 transformations carried out by routers and edge label switches.  Edge nodes
-        may also have to move sequence number fields among Layer 2, PW, and IPv6 encapsulations.
+        may also have to move sequence number fields among Layer 2, PW, and IP encapsulations.
     </t>
  </section>
 
@@ -1675,83 +1670,117 @@ Examples:
     While management plane and control planes are traditionally
     considered separately, from the Data Plane perspective there is no
     practical difference based on the origin of flow provisioning
-    information.  This document therefore does not distinguish between
+    information, and the DetNet architecture <xref
+    target="I-D.ietf-detnet-architecture"/> refers to these collectively
+    as the 'Controller Plane'.  This document therefore does not distinguish between
     information provided by distributed control plane protocols, e.g., RSVP-TE <xref
     target="RFC3209"/> and <xref target="RFC3473"/>, or by centralized network
     management mechanisms, e.g., RestConf <xref target="RFC8040"/>,
     YANG <xref target="RFC7950"/>, and
-    the Path Computation Element Communication Protocol (PCEP) <xref target="I-D.ietf-pce-pcep-extension-for-pce-controller"/>. That said, there are particular considerations and requirements for DetNet that are discussed in <xref target="control-management-requirements"/>.
+    the Path Computation Element Communication Protocol (PCEP) <xref
+    target="I-D.ietf-pce-pcep-extension-for-pce-controller"/> or any
+    combination thereof. Specific considerations and requirements for DetNet that are discussed in <xref target="control-management-requirements"/>.
  </t>
   <section title="S-Label and T-Label Assignment and Distribution">
    <t>
 [Editor's note - we may need additional text on resource allocation in this section.]
    </t>
    <t>
-    DetNet S-Labels (see <xref target="flow-identification"/> for their definition) are similar to other MPLS service labels that denote the contents of the MPLS packet payload being
-   other than a normal routed IP packet, such as a layer 2 pseudowire, an IP packet that is
+    DetNet S-Labels (see <xref target="flow-identification"/> for their
+    definition) are similar to other MPLS service labels that denote the
+    contents of the MPLS packet payload such as a layer 2 pseudowire, an IP packet that is
    routed in a VPN context with a private address, or an Ethernet
-   virtual private wire service.
+   virtual private network (EVPN) service.
    </t>
    <t>
-   Like other service labels, they are allocated by the
-   downstream receiver of DetNet packets from its platform label space. S-Labels uniquely identify a particular DetNet flow, and are local to the node on which the label is allocated. They are used to identify the flow that a packet belongs to as it traverses a particular node in a DetNet domain. Because labels are local to each node rather than being a global identifier within a domain, they must be advertised to their upstream DetNet service-aware peer nodes (e.g., a MPLS DetNet End System as shown in <xref target="fig_pw_detnet"/>, or a DetNet Relay or Edge Node as shown in <xref target="fig_pw_detnet2"/>).
+     S-Labels are expected to be allocated in the same manner as any other service
+     labels. S-Labels uniquely identify a particular DetNet flow, and
+     are local to the node on which the label is allocated. In the
+     DetNet service layer the explicit route consists of the set of
+     Relay Nodes that the DetNet flow must traverse.  They can be used
+     to identify the DetNet flow that a packet belongs to as it
+     traverses a particular node in a DetNet domain. Because labels are
+     local to each node rather than being a global identifier within a
+     domain, they must be advertised to their upstream DetNet
+     service-aware peer nodes (e.g., a MPLS DetNet End System as shown
+     in <xref target="fig_pw_detnet"/>, or a DetNet Relay or Edge Node
+     as shown in <xref target="fig_pw_detnet2"/>) and interpreted in the
+     context of their received T-Label.
    </t>
    <t>
-   As discussed in <xref target="sec_dt_dp"/>, The transport layer uses one or T-Labels to transport DetNet packets between DetNet service-aware nodes along explicitly defined routes at the DetNet layer and in the MPLS layer.
-    In the DetNet layer the explicit route consists of the set of Relay Nodes that the
-    DetNet flow must traverse. In the MPLS layer the explicit route consists of the set
-    of LSRs, links, and possibly link bundle members and queues that the DetNet packets of a flow
-    must traverse between nodes in the DetNet layer (i.e. between a specific Edge Node and
-    the next hop Relay Node, between specific Relay Nodes, and between a specific Relay node and
-    the egress Edge Node. This detailed steering is needed to ensure that packets are routed through
-    the resources that have been reserved for them, and hence provide the DetNet application
-    with the required performance.
+     As discussed in <xref target="sec_dt_dp"/>, the transport layer
+     uses one or more T-Labels to transport DetNet packets between
+     DetNet service-aware nodes along explicitly defined routes at the
+     DetNet Transport layer, which in the context of this document is
+     the MPLS layer.  In the DetNet Transport (MPLS) layer the explicit
+     route consists of the set of DetNet nodes which are LSRs, links,
+     and possibly link bundle members and queues that the DetNet packets
+     of a flow must traverse between nodes in the DetNet service layer
+     (i.e. between a specific Edge Node and the next hop Relay Node,
+     between specific Relay Nodes, and between a specific Relay node and
+     the egress Edge Node. Resource allocation corresponding to the set
+     of Services supported over the Transport layer, which may or may
+     not include aggregation, is required at this layer. Explicit
+     routes are used to ensure that packets are routed through the
+     resources that have been reserved for them, and hence provide the
+     DetNet application with the required service.
    </t>
    <t>
-    Whether configuring, calculating and instantiating these routes is a single-stage or multi-stage process is out of scope of this document.
-   </t>
-   <t>
-    A reasonable expectation is that explicitly setting up routes at the DetNet layer
-    will be through the use of a centralized management controller.
+    Whether configuring, calculating and instantiating these routes is a
+    single-stage or multi-stage process, or in a centralized or
+    distributed manner, is out of scope of this document.
    </t>
    <t>
     There are a number of approaches that could be used to provide
-    explicit routes in the MPLS layer:
+    explicit routes and resource allocation in the MPLS layer:
     <list style="symbols">
      <t>
-      The route could be explicitly set up by a centralized management controller calculating the path and
-      explicitly configuring each node along that path.
+      The path could be explicitly set up by a controller which
+      calculates the path and
+      explicitly configures each node along that path with the
+      appropriate forwarding and resource allocation information.
      </t>
      <t>
-      The route could be set up using RSVP-TE signaling.
+      The path could be set up using RSVP-TE signaling.
      </t>
      <t>
-      The path could be implemented using MPLS-based segment routing.
+      The path could be implemented using
+      MPLS-based segment routing that is extended to support resource
+      allocation.
      </t>
     </list>
    See <xref target="control-management-requirements"/> for further discussion of these alternatives.
    </t>
     <t>
     Much like other MPLS labels, there are a number of alternatives available for DetNet S-Label and T-label advertisement to an upstream peer node. These include distributed signaling protocols such as RSVP-TE, centralized label distribution via a controller that manages both the sender and the
-   receiver using NETCONF/YANG, BGP, PCEP, etc., and hybrid combinations of the two, and could also make use of MPLS-based segment routing.
+   receiver using NETCONF/YANG, BGP, PCEP, etc., and hybrid combinations of the two.
    The details of
-    the control plane protocol solution required for the label distribution and the management of the
+    the controller plane solution required for the label distribution and the management of the
     label number space are out of scope of this document, but as mentioned above, there are particular DetNet considerations and requirements that are discussed in <xref target="control-management-requirements"/>.
    </t>
  </section>
  <section title="Packet Replication, Elimination, and Ordering (PREOF)">
   <t>
-   The control plane protocol solution required for managing the PREOF processing
-   is outside the scope of this document. That said, it should be noted that the ability to determine, for a particular flow, optimal packet replication and elimination points in the DetNet domain may require enhancements to existing methods of establishing explicit paths through a network. There may be capabilities that can be
-adopted from technologies like GMPLS end-to-end recovery <xref target="RFC4872"/> and GMPLS segment recovery <xref target="RFC4873"/>.
+   The controller plane protocol solution required for managing the PREOF processing
+   is outside the scope of this document. That said, it should be noted
+   that the ability to determine, for a particular flow, optimal packet
+   replication and elimination points in the DetNet domain requires
+   explicit support. There are be capabilities that can be used, or
+   extended, for example GMPLS end-to-end recovery <xref target="RFC4872"/> and GMPLS segment recovery <xref target="RFC4873"/>.
   </t>
  </section>
- <section title="Contention Loss and Latency Control">
+ <section title="Contention Loss and Jitter Reduction">
      <t>
-         As discussed in <xref target="sec_intro"/>, this document does
-   not specify traffic handling capabilities required to prevent
-   contention loss and deliver latency control for DetNet flows at the
-   DetNet transport layer. However, the ability to manage node and link resources to be able to provide these functions will be a necessary part of the DetNet control and management planes. It will also be necessary to be able to signal or provision the required queuing disciplines needed to provide these functions along a flow's path through the network. See <xref target="control-management-requirements"/> for further discussion of these requirements.
+       As discussed in <xref target="sec_intro"/>, this document does
+       not specify the mechanisms needed to eliminate contention loss or
+       reduce jitter for DetNet flows at the DetNet transport layer.
+       The ability to manage node and link resources to be able to
+       provide these functions will be a necessary part of the DetNet
+       controller plane. It will also be necessary to be able to control
+       the required queuing mechanisms used to provide these functions
+       along a flow's path through the network. See <xref
+       target="control-management-requirements"/> for further discussion
+       of these requirements.
      </t>
  </section>
  <section title="Bidirectional Traffic">
@@ -1771,7 +1800,7 @@ adopted from technologies like GMPLS end-to-end recovery <xref target="RFC4872"/
     unidirectional component LSPs share fate.  In both types of bidirectional
     LSPs, resource reservations may differ in each direction.  The concepts of
     associated bidirectional flows and co-routed bidirectional flows can be
-    applied to DetNet flows as well whether IPv6 or MPLS is used.
+    applied to DetNet flows.
   </t>
   <t>
     While the MPLS data plane must support bidirectional DetNet flows,
@@ -1780,15 +1809,16 @@ adopted from technologies like GMPLS end-to-end recovery <xref target="RFC4872"/
     and associated vs co-routed bidirectional flows can be managed at the
     control level.  Note that there is no stated requirement for bidirectional
     DetNet flows to be supported using the same MPLS Labels
-    in each direction.
+    in each direction.  
      </t>
      <t>
-    DetNet's use of PREOF increases the difficulty of using co-routing bidirectional flows, since if PREOF is used, then the replication points in one direction would have to match the elimination points in the other direction, and vice versa, and the optimal points for these functions in one direction may not match the optimal points in the other.
+    DetNet's use of PREOF may increase the complexity of using co-routing bidirectional flows, since if PREOF is used, then the replication points in one direction would have to match the elimination points in the other direction, and vice versa, and the optimal points for these functions in one direction may not match the optimal points in the other.
      </t>
      <t>
     Control and management mechanisms will need to support
     bidirectional flows, but the specification of such mechanisms are out of
-    scope of this document. That said, it may be possible to take advantage of signaling mechanisms that were originally developed for GMPLS (such as <xref target="RFC6387"/>) and MPLS-TP (such as <xref target="RFC6373"/>).
+    scope of this document. Related control plan mechanisms have been
+    defined in <xref target="RFC3473"/>, <xref target="RFC6387"/> and <xref target="RFC7551"/>.
      </t>
      <t>
     This is further discussed in <xref target="control-management-requirements"/>.
@@ -1796,15 +1826,16 @@ adopted from technologies like GMPLS end-to-end recovery <xref target="RFC4872"/
  </section>
  <section title="Flow Aggregation Control">
      <t>
-      <xref target="FAG"/> discusses the use of flow aggregation in DetNet. It includes flow aggregation accomplished through the use of hierarchical LSPs, aggregating multiple DetNet flows into a single new DetNet flow, and simple aggregation at the DetNet layer. It will be the responsibility of the DetNet control and management plane to be able to properly provision the use of these mechanisms. These requirements are included in the next section.
+      <xref target="FAG"/> discusses the use of flow aggregation in DetNet. It includes flow aggregation accomplished through the use of hierarchical LSPs, aggregating multiple DetNet flows into a single new DetNet flow, and simple aggregation at the DetNet layer. It will be the responsibility of the DetNet controller plane to be able to properly provision the use of these mechanisms. These requirements are included in the next section.
      </t>
  </section>
- <section anchor="control-management-requirements" title="DetNet Control and Management Plane Requirements">
+ <section anchor="control-management-requirements" title="DetNet
+                                                          Controller (Control and Management) Plane Requirements">
      <t>
-         While the definition of control and management planes for DetNet is out of the scope of this document, there are particular considerations and requirements for such that result from the unique characteristics of the DetNet architecture <xref target="I-D.ietf-detnet-architecture"/> and data plane as defined herein.
+         While the definition of controller plane for DetNet is out of the scope of this document, there are particular considerations and requirements for such that result from the unique characteristics of the DetNet architecture <xref target="I-D.ietf-detnet-architecture"/> and data plane as defined herein.
      </t>
      <t>
-         The primary requirements of the DetNet control and management planes are that they must be able to:
+         The primary requirements of the DetNet controller plane are that it must be able to:
         <list style="symbols">
    <t>Instantiate DetNet flows in a DetNet domain (which may include some or all of explicit path and PREOF replication and elimination node determination, link bandwidth reservations, node buffer and other resource reservations, specification of required queuing disciplines along the path, ability to manage bidirectional flows, etc.) as needed for a flow.</t>
    <t>Manage DetNet S-Label and T-Label allocation and distribution, when the DetNet MPLS encapsulation is in use</t>
@@ -2291,6 +2322,7 @@ Note: * no service sub-layer for transit nodes
   &rfc6387;
     <?rfc include="reference.RFC.6790"?>
    <?rfc include="reference.RFC.7950"?>
+   <?rfc include="reference.RFC.7551"?>
    <?rfc include="reference.RFC.8040"?>
    &I-D.ietf-detnet-dp-alt;
    &I-D.ietf-pce-pcep-extension-for-pce-controller;
