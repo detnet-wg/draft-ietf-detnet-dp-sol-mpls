@@ -1482,23 +1482,24 @@ Examples:
      target="RFC5129"/> and updated by <xref target="RFC5462"/>.
   </t>
   <t>
-     CoS for DetNet flows carried in IPv6 is provided using the standard
-     differentiated services code point (DSCP) field <xref
-     target="RFC2474"/> and related mechanisms.  The 2-bit explicit
-     congestion notification (ECN) <xref target="RFC3168"/> field MAY
-     also be used.
-  </t>
-  <t>
     One additional consideration for DetNet nodes which support CoS
     services is that they MUST ensure that the CoS service classes do
     not impact the congestion protection and latency control mechanisms
     used to provide DetNet QoS.  This requirement is similar to
     requirement for MPLS LSRs to that CoS LSPs do not impact the
-    resources allocated to TE LSPs via <xref target="RFC3473"/>.
+    resources allocated to TE LSPs, e.g.,  via <xref target="RFC3473"/>.
   </t>
  </section>
 
  <section title="Quality of Service">
+  <t>
+   In addition to explicit routes, and packet replication and elimination, described in <xref
+   target="dn-dt-solution"/> above, DetNet provides zero congestion loss and bounded latency and
+   jitter.  As described in <xref target="I-D.ietf-detnet-architecture"/>, there are different
+   mechanisms that maybe used separately or in combination to deliver a zero congestion loss
+   service.  This includes Quality of Service (QoS) mechanisms at the MPLS layer, that may be
+   combined with the mechanisms defined by the underlying network layer such as 802.1TSN.
+  </t>
   <t>
    Quality of Service (QoS) mechanisms for flow specific traffic treatment typically includes a
    guarantee/agreement for the service, and allocation of resources to support the service.
@@ -1508,15 +1509,7 @@ Examples:
    target="RFC2205">Resource ReSerVation Protocol (RSVP)</xref> (RSVP) and RSVP-TE <xref
    target="RFC3209"/> and <xref target="RFC3473"/>.  The existing MPLS mechanisms defined to
    support CoS <xref target="RFC3270"/> can also be used to reserve resources for specific traffic
-   classes.
-  </t>
-  <t>
-   In addition to explicit routes, and packet replication and elimination, described in <xref
-   target="dn-dt-solution"/> above, DetNet provides zero congestion loss and bounded latency and
-   jitter.  As described in <xref target="I-D.ietf-detnet-architecture"/>, there are different
-   mechanisms that maybe used separately or in combination to deliver a zero congestion loss
-   service.  These mechanisms are provided by the either the MPLS or IP layers, and may be
-   combined with the mechanisms defined by the underlying network layer such as 802.1TSN.
+   classes. 
   </t>
   <t>
    A baseline set of QoS capabilities for DetNet flows carried in PWs
@@ -1534,20 +1527,21 @@ Examples:
    of flows requiring DetNet QoS.
   </t>
   <t>
-   Packets that are marked with a DetNet Class of Service value, but that have not been
-   the subject of a completed reservation, can disrupt the QoS offered to properly
+   Packets that are marked in a way that does not correspond to
+   allocated resources can disrupt the QoS offered to properly
    reserved DetNet flows by using resources allocated to the reserved flows.  Therefore,
    the network nodes of a DetNet network:
 
    <list style="symbols">
     <t>
-     MUST defend the DetNet QoS by discarding or remarking (to a non-DetNet CoS)
-     packets received that are not the subject of a completed reservation.
+     MUST defend the DetNet QoS by discarding or remarking (to an
+     allocated DetNet flow or non-competing non-DetNet flow)
+     packets received that are not the subject of a completed resource allocation.
     </t>
     <t>
-     MUST NOT use a DetNet reserved resource, e.g. a queue or shaper reserved for
-     DetNet flows, for any packet that does not carry a DetNet Class of Service
-     marker.
+     MUST NOT use a DetNet allocated resource, e.g. a queue or shaper reserved for
+     DetNet flows, for any packet that does match the corresponding
+     DetNet flow.
     </t>
    </list>
   </t>
@@ -1629,7 +1623,7 @@ Examples:
         Ensuring that the proper Ethernet VLAN tag priority and destination MAC address
         are used on a DetNet/TSN packet may require further clarification of the customary
         L2/L3 transformations carried out by routers and edge label switches.  Edge nodes
-        may also have to move sequence number fields among Layer 2, PW, and IPv6 encapsulations.
+        may also have to move sequence number fields among Layer 2, PW, and IP encapsulations.
     </t>
  </section>
 
@@ -1771,7 +1765,7 @@ adopted from technologies like GMPLS end-to-end recovery <xref target="RFC4872"/
     unidirectional component LSPs share fate.  In both types of bidirectional
     LSPs, resource reservations may differ in each direction.  The concepts of
     associated bidirectional flows and co-routed bidirectional flows can be
-    applied to DetNet flows as well whether IPv6 or MPLS is used.
+    applied to DetNet flows.
   </t>
   <t>
     While the MPLS data plane must support bidirectional DetNet flows,
