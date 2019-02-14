@@ -153,10 +153,11 @@ LB: General comments:
    (PEF) and Packet Ordering (POF) functions in the MPLS data plane.
   </t>
   <t>
-   This document does not define the associated control plane functions, or
-   Operations, Administration, and Maintenance (OAM).  It also does not specify
-   traffic handling capabilities required to eliminate contention loss
-   or reduce jitter for DetNet flows at the DetNet transport layer.
+   This document does not define the associated control plane functions,
+   or Operations, Administration, and Maintenance (OAM).  While
+   requiring implementations to control contention loss and jitter of
+   DetNet flows, this document does not specify the specific mechanisms
+   needed to eliminate contention loss or reduce jitter.
   </t>
  </section>
 
@@ -1692,7 +1693,7 @@ Examples:
    virtual private network (EVPN) service.
    </t>
    <t>
-     S-Labels are expected to be allocated just like any other service
+     S-Labels are expected to be allocated in the same manner as any other service
      labels. S-Labels uniquely identify a particular DetNet flow, and
      are local to the node on which the label is allocated. In the
      DetNet service layer the explicit route consists of the set of
@@ -1704,7 +1705,7 @@ Examples:
      service-aware peer nodes (e.g., a MPLS DetNet End System as shown
      in <xref target="fig_pw_detnet"/>, or a DetNet Relay or Edge Node
      as shown in <xref target="fig_pw_detnet2"/>) and interpreted in the
-     context of their received T-Label..
+     context of their received T-Label.
    </t>
    <t>
      As discussed in <xref target="sec_dt_dp"/>, the transport layer
@@ -1720,14 +1721,14 @@ Examples:
      the egress Edge Node. Resource allocation corresponding to the set
      of Services supported over the Transport layer, which may or may
      not include aggregation, is required at this layer. Explicit
-     routers are used to ensure that packets are routed through the
+     routes are used to ensure that packets are routed through the
      resources that have been reserved for them, and hence provide the
-     DetNet application with the required performance.
+     DetNet application with the required service.
    </t>
    <t>
     Whether configuring, calculating and instantiating these routes is a
     single-stage or multi-stage process, or in a centralized or
-    distributed manner is out of scope of this document.
+    distributed manner, is out of scope of this document.
    </t>
    <t>
     There are a number of approaches that could be used to provide
@@ -1770,13 +1771,16 @@ Examples:
  </section>
  <section title="Contention Loss and Jitter Reduction">
      <t>
-         As discussed in <xref target="sec_intro"/>, the DetNet
-         transport layer prevents
-   contention loss and delivers jitter reduction for DetNet flows at the
-   DetNet transport layer. The ability to manage node and link
-   resources to be able to provide these functions will be a necessary
-   part of the DetNet controller plane. It will also be
-   necessary to be able to control the required queuing mechanisms used to provide these functions along a flow's path through the network. See <xref target="control-management-requirements"/> for further discussion of these requirements.
+       As discussed in <xref target="sec_intro"/>, this document does
+       not specify the mechanisms needed to eliminate contention loss or
+       reduce jitter for DetNet flows at the DetNet transport layer.
+       The ability to manage node and link resources to be able to
+       provide these functions will be a necessary part of the DetNet
+       controller plane. It will also be necessary to be able to control
+       the required queuing mechanisms used to provide these functions
+       along a flow's path through the network. See <xref
+       target="control-management-requirements"/> for further discussion
+       of these requirements.
      </t>
  </section>
  <section title="Bidirectional Traffic">
@@ -1814,7 +1818,7 @@ Examples:
     Control and management mechanisms will need to support
     bidirectional flows, but the specification of such mechanisms are out of
     scope of this document. Related control plan mechanisms have been
-    defined in <xref target="RFC3473"/>, <xref target="RFC6387"/> and <xref target="RFC7551"/>
+    defined in <xref target="RFC3473"/>, <xref target="RFC6387"/> and <xref target="RFC7551"/>.
      </t>
      <t>
     This is further discussed in <xref target="control-management-requirements"/>.
