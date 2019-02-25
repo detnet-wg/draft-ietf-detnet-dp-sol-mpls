@@ -32,7 +32,6 @@
 <!ENTITY rfc5960 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5960.xml">
 <!ENTITY rfc6275 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6275.xml">
 <!ENTITY rfc6371 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6371.xml">
-<!ENTITY rfc6373 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6373.xml">
 <!ENTITY rfc6378 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6378.xml">
 <!ENTITY rfc6387 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6387.xml">
 <!ENTITY rfc6426 PUBLIC "" "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6426.xml">
@@ -191,7 +190,7 @@ LB: General comments:
 
   <section title="Abbreviations">
   <t>
-   The following abbreviations used in this document:
+   The following abbreviations are used in this document:
    <list style="hanging" hangIndent="14">
     <t hangText="AC">Attachment Circuit.</t>
     <t hangText="CE">Customer Edge equipment.</t>
@@ -248,7 +247,8 @@ LB: General comments:
     mechanisms, and supports the DetNet forwarding layer based on
     existing MPLS Traffic Engineering encapsulations and mechanisms.
     Background on PWs can be found in <xref target="RFC3985"/> and <xref
-    target="RFC3031"/>.
+    target="RFC3031"/>. Background on MPLS Traffic Engineering can be
+    found in <xref target="RFC3272"/> and <xref target="RFC3209"/>.
   </t>
   <figure anchor="dn_mpls_dp_approach" align="center"
           title="DetNet adaptation to MPLS data plane">
@@ -272,15 +272,15 @@ LB: General comments:
     supported by a DetNet control word (d-CW) which conforms to the
     Generic PW MPLS Control Word (PWMCW) defined in <xref
     target="RFC4385"/>.  A d-CW identifying service label (S-Label) is
-    also used. The forwarding layer is supported by one or labels (F-Labels).
+    also used. The forwarding layer is supported by one or forwarding labels (F-Labels).
   </t>
 
  <t>
-  A node operating on a DetNet flow in the Detnet layer, i.e. a node processing a
+  A node operating on a DetNet flow in the Detnet service layer, i.e. a node processing a
   DetNet packet which has the S-label as top of stack uses the local context
-  associated with that S-label to determine what local operation(s) are
-  applied to that packet. The S-label has to be unique on each edge and
-  relay node, which is achieved by using a label taken from the platform
+  associated with that S-label, for example a received F-Label, to determine what local DegtNet operation(s) are
+  applied to that packet. An S-label generally is unique on each edge and
+  relay node, which can be achieved by using a label taken from the platform
   label space <xref target="RFC3031"/>.
  </t>
 
@@ -293,17 +293,17 @@ LB: General comments:
 <figure anchor="fig_tsn_mpls_detnet" align="center"
 title="A TSN over DetNet MPLS Enabled Network">
 <artwork align="center"><![CDATA[
- TSN             Edge          Transit        Edge         TSN
- End System      Node           Node          Node         End System
+ TSN             Edge          Transit        Edge        TSN
+ End System      Node           Node          Node        End System
                 (T-PE)         (LSR)          (T-PE)
 
-+----------+  +.........+                   +.........+   +----------+
-|   Appl.  |<-:Svc Proxy:--End to End Svc.--:Svc Proxy:-->|   Appl.  |
-+----------+  +---------+                   +---------+   +----------+
-|    TSN   |  |TSN| |Svc|<-- DetNet flow -->: Service :-->|    TSN   |
-+----------+  +---+ +---+    +----------+   +---------+   +----------+
-|Forwarding|  |Fwd| |Fwd|    |Forwarding|   |Fwd| |Fwd|   |Forwarding|
-+------.---+  +--.+ +-.-+    +---.----.-+   +--.+ +-.-+   +---.------+
++----------+  +.........+                   +.........+  +----------+
+|   Appl.  |<-:Svc Proxy:--End to End Svc.--:Svc Proxy:->|   Appl.  |
++----------+  +---------+                   +---------+  +----------+
+|    TSN   |  |TSN| |Svc|<-- DetNet flow -->: Service :->|    TSN   |
++----------+  +---+ +---+    +----------+   +---------+  +----------+
+|Forwarding|  |Fwd| |Fwd|    |Forwarding|   |Fwd| |Fwd|  |Forwarding|
++------.---+  +--.+ +-.-+    +---.----.-+   +--.+ +-.-+  +----.-----+
        :   Link  :    /  ,-----.  \   :  Link  :   /  ,-----.  \
        +.........+    +-[  Sub  ]-+   +........+   +-[  Sub  ]-+
                         [Network]                    [Network]
@@ -329,44 +329,46 @@ title="A TSN over DetNet MPLS Enabled Network">
 	at the edge of the DetNet domain. It ensures that the DN Flow is properly served at the Edge node (and inside the domain).
   </t>
   <t>
-   Transit nodes are normal MPLS Label Switching Routers (LSRs).  They
-   are generally unaware of the special requirements of DetNet flows, although
+   Transit nodes may be non-DetNet aware MPLS Label Switching Routers
+   (LSRs).  In this case, they
+   would be unaware of the special requirements of DetNet service information, although
    they need to provide traffic engineering services and proper QoS to
-   the LSPs associated with DetNet flows to enhance the prospect of the
-   LSPs meeting the DetNet service requirements. Some implementations of
+   the LSPs associated with DetNet flows to ensure the
+   LSPs meet the DetNet service requirements. Some implementations of
    transit nodes may be DetNet aware, but such nodes just support the DetNet
    forwarding layer.
   </t>
   <t>
    The MPLS LSP may be provided by any MPLS method (provisioned, RSVP-TE, MPLS-
-   TP, or MPLS Segment Routing (SR)).
+   TP, or MPLS Segment Routing (SR) which is extended to support
+   resource allocation).
   </t>
   <figure align="center" anchor="fig_ip_mpls_detnet"
           title="DetNet (DN) IP Over MPLS Network">
     <artwork><![CDATA[
-IP  DetNet        Relay        Transit          Relay       IP DetNet
-End System        Node          Node            Node        End System
-                  (T-PE)        (LSR)           (T-PE)
-+----------+                                               +----------+
-|   Appl.  |<------------- End to End Service ------------>|   Appl.  |
-+----------+   .....-----+                   +-----.....   +----------+
-| Service  |<--: Service |--- DetNet flow ---| Service :-->| Service  |
-+----------+   +---------+   +----------+    +---------+   +----------+
-|Forwarding|   |Fwd| |Fwd|   |Forwarding|    |Fwd| |Fwd|   |Forwarding|
-+-------.--+   +-.-+ +-.-+   +---.----.-+    +-.-+ +-.-+   +---.------+
-        :  Link  :    /  ,-----.  \   :  Link  :    /  ,-----.  \
-        +........+    +-[  Sub  ]-+   +........+    +-[  Sub  ]-+
-                        [Network]                     [Network]
-                         `-----'                       `-----'
+IP  DetNet        Relay       Transit         Relay       IP DetNet
+End System        Node         Node           Node        End System
+                  (T-PE)       (LSR)          (T-PE)
++----------+                                             +----------+
+|   Appl.  |<------------ End to End Service ----------->|   Appl.  |
++----------+   .....-----+                 +-----.....   +----------+
+| Service  |<--: Service |-- DetNet flow --| Service :-->| Service  |
++----------+   +---------+  +----------+   +---------+   +----------+
+|Forwarding|   |Fwd| |Fwd|  |Forwarding|   |Fwd| |Fwd|   |Forwarding|
++-------.--+   +-.-+ +-.-+  +----.---.-+   +-.-+ +-.-+   +---.------+
+        :  Link  :    /  ,-----.  \   : Link :    /  ,-----.  \
+        +........+    +-[  Sub  ]-+   +......+    +-[  Sub  ]-+
+                        [Network]                   [Network]
+                         `-----'                     `-----'
 
-        |<- DN IP->| |<------ DetNet MPLS ------>| |< -DN IP ->|
+        |<- DN IP->| |<---- DetNet MPLS ---->| |< -DN IP ->|
         ]]></artwork>
   </figure>
   <t>
    <xref target="fig_ip_mpls_detnet"/> and <xref
    target="fig_8021_detnet"/>, show different cases where relay nodes
    may be used.  Relay nodes are similar to edge nodes in that both are
-   aware of the needs of particular DetNet flows and take care to
+   aware of the needs of particular DetNet App-flows and take care to
    process them in accordance with the required performance needs.  They
    differ in that relay nodes sit within a DetNet domain while edge
    nodes always sit at DetNet domain boundaries.  Both node types can
@@ -381,7 +383,7 @@ End System        Node          Node            Node        End System
   <t>
    <xref target="fig_8021_detnet"/> illustrates how DetNet can provide services for IEEE 802.1TSN
    end systems, CE1 and CE2, over a DetNet enabled network.  The edge nodes, E1 and E2, insert and remove required DetNet data
-   plane encapsulation.  The 'X' in the edge nodes and relay node, R1, represent a potential DetNet flow
+   plane encapsulation.  The 'X' in the edge nodes and relay node, R1, represent a potential DetNet compound flow
    packet replication and elimination point.  This conceptually parallels L2VPN services, and could
    leverage existing related solutions as discussed below.
   </t>
@@ -423,7 +425,7 @@ System |    +--------+       +--------+       +--------+   |  System
   to send and receive DetNet flows, and R1 and R2 are relay nodes as
   they sit in the middle of a DetNet network.  For example, an end system sends data
   encapsulated in MPLS.  The 'X' in the end systems, and relay nodes
-  represents potential DetNet flow packet replication and elimination points.
+  represents potential DetNet compound flow packet replication and elimination points.
   In this figure, the relay nodes may change the underlying forwarding layer, for example
   tunneling MPLS over IP <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>, or simply interconnect
   network segments.
@@ -599,14 +601,14 @@ CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
     <list style="hanging">
       <t hangText="Eliminating contention loss and jitter reduction:">
         <vspace blankLines="1"/>
-        Usage of allocated resources (queuing, policing, shaping) to ensure
+        Use of allocated resources (queuing, policing, shaping) to ensure
         that the congestion-related loss and latency/jitter requirements of
         a DetNet flow are met.
       </t>
       <t hangText="Explicit routes:">
         <vspace blankLines="1"/>
         Use of a specific path for a flow.  This limits
-        miss-ordering and latency.
+        miss-ordering and bounds latency.
       </t>
 
       <t hangText="Service protection:">
@@ -622,7 +624,7 @@ CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
         <vspace blankLines="1"/>
         Generally, distributing packets of the same DetNet flow over
         multiple paths is not recommended. Such load sharing,
-        e.g., via ECMP or UCMP, impacts ordering and end-to-end jitter.
+        e.g., via ECMP or UCMP, impacts ordering and effective jitter.
       </t>
       <t hangText="Troubleshooting:"> <vspace blankLines="1"/>
       For example, to support identification of misbehaving flows.
@@ -1067,8 +1069,8 @@ Examples:
 |       DetNet Control Word       |    |
 +---------------------------------+    +--> DetNet data plane
 |           S-Label               |    |    MPLS encapsulation
-+---------------------------------+ <--/
-|           F-Label(s)            |
++---------------------------------+    |
+|           F-Label(s)            | <--/
 +---------------------------------+
 |           Data-Link             |
 +---------------------------------+
@@ -1194,9 +1196,6 @@ Examples:
     </list>
    </t>
    <t>
-    A further method of using SR to perform aggregation is for further study.
-   </t>
-   <t>
     The resource control and
     management aspects of aggregation (including the queuing/shaping/
     policing implications) will be covered in other documents.
@@ -1280,8 +1279,8 @@ Examples:
 |       DetNet Control Word       |    |    MPLS encapsulation
 +=================================+    |
 |            A-Label              |    |
-+---------------------------------+ <--/
-|           F-Label(s)            |
++---------------------------------+    | 
+|           F-Label(s)            | <--/
 +---------------------------------+
 |           Data-Link             |
 +---------------------------------+
@@ -1325,8 +1324,8 @@ Examples:
  |            S-Label              |    +----DetNet data plane
  +---------------------------------+    |    MPLS encapsulation
  |            A-Label              |    |
- +---------------------------------+ <--/
- |           F-Label(s)            |
+ +---------------------------------+    |
+ |           F-Label(s)            | <--/
  +---------------------------------+
  |           Data-Link             |
  +---------------------------------+
@@ -1527,7 +1526,8 @@ Examples:
  </section>
 
  <section title="Cross-DetNet flow resource aggregation" anchor="Aggregation">
-  <t> [Editor's NOTE: keep and extend this section.]
+  <t> [Editor's NOTE: Isn't this section the same as "Aggregation at the
+  LSP".]
   </t>
    <t>
      The ability to aggregate individual flows, and their associated
@@ -1556,17 +1556,9 @@ Examples:
      service is preserved.
    </t>
    <t>
-     DetNet flows forwarded via IP have more limited aggregation
-     options, due to the available traffic flow identification fields of
-     the IP solution.  One available approach is to manage the resources
-     associated with a DSCP identified traffic class and to map (remark)
-     individually controlled DetNet flows onto that traffic class.  This
-     approach also requires that nodes support aggregation ensure that
-     traffic from aggregated LSPs are placed (shaped/policed/enqueued)
-     in a fashion that ensures the required DetNet service is preserved.
-   </t>
-   <t>
-     In both the MPLS and IP cases, additional details of the traffic control
+     [NOTE: This needs to be revised:]
+
+     Additional details of the traffic control
      capabilities needed at a DetNet-aware node may be covered in the
      new service descriptions mentioned above or in separate future
      documents.  Management and control plane mechanisms will also need
@@ -1577,7 +1569,8 @@ Examples:
  </section>
 
  <section title="Layer 2 addressing and QoS Considerations">
-  <t> [Editor's NOTE: review and simplify this section.]
+  <t> [Editor's NOTE: review and simplify this section. Doesn't this
+  belong in the TSN section?]
   </t>
     <t>
         The Time-Sensitive Networking (TSN) Task Group of the IEEE 802.1 Working Group have
@@ -2122,8 +2115,8 @@ Note: * no service sub-layer for transit nodes
   |       DetNet Control Word       |    |
   +---------------------------------+    +--> DetNet data plane
   |           S-Label               |    |    MPLS encapsulation
-  +---------------------------------+ <--/
-  |           F-Label(s)            |
+  +---------------------------------+    |
+  |           F-Label(s)            | <--/
   +---------------------------------+
   |           UDP Header            |
   +---------------------------------+
@@ -2268,7 +2261,6 @@ Note: * no service sub-layer for transit nodes
    <?rfc include="reference.RFC.2211"?>
    <?rfc include="reference.RFC.2212"?>
    <?rfc include="reference.RFC.2474"?>
-   <?rfc include="reference.RFC.3168"?>
    <?rfc include="reference.RFC.3031"?>
    <?rfc include="reference.RFC.3032"?>
    <?rfc include="reference.RFC.3209"?>
@@ -2288,6 +2280,7 @@ Note: * no service sub-layer for transit nodes
   </references>
   <references title="Informative references">
    <?rfc include="reference.RFC.2205"?>
+   <?rfc include="reference.RFC.3272"?>
    &rfc3985;
    &rfc4448;
    &rfc4872;
@@ -2296,7 +2289,6 @@ Note: * no service sub-layer for transit nodes
    <?rfc include="reference.RFC.5654"?>
    <?rfc include="reference.RFC.5921"?>
    <?rfc include="reference.RFC.6073"?>
-  &rfc6373;
   &rfc6387;
     <?rfc include="reference.RFC.6790"?>
    <?rfc include="reference.RFC.7950"?>
