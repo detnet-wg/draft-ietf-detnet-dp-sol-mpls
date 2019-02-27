@@ -1578,7 +1578,9 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
     YANG <xref target="RFC7950"/>, and
     the Path Computation Element Communication Protocol (PCEP) <xref
     target="I-D.ietf-pce-pcep-extension-for-pce-controller"/> or any
-    combination thereof. Specific considerations and requirements for DetNet that are discussed in <xref target="control-management-requirements"/>.
+    combination thereof. Specific considerations and requirements for
+    the DetNet Controller Plane are discussed in <xref
+    target="control-management-requirements"/>.
  </t>
   <section title="S-Label and F-Label Assignment and Distribution">
    <t>
