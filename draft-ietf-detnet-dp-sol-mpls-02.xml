@@ -174,7 +174,7 @@
  </section>
 
  <section title="Terminology">
-  <section title="Terms used in this document">
+  <section title="Terms Used in This Document">
   <t>
    This document uses the terminology established in the DetNet architecture
    <xref target="I-D.ietf-detnet-architecture"/>, and the reader is assumed
@@ -236,7 +236,7 @@
   </section>
  </section>  <!-- end of terminology -->
 
- <section title="Requirements language">
+ <section title="Requirements Language">
   <t>
     The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
     "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
@@ -246,8 +246,8 @@
   </t>
  </section>
 
- <section title="MPLS DetNet data plane overview" anchor="sec_dt_dp">
-  <section title="Layers of DetNet data plane" anchor="sec_lay_dt_dp">
+ <section title="MPLS DetNet Data Plane Overview" anchor="sec_dt_dp">
+  <section title="Layers of DetNet Data Plane" anchor="sec_lay_dt_dp">
   <t>
     This document describes how DetNet flows are carried over MPLS
     networks. The DetNet Architecture, <xref
@@ -262,7 +262,7 @@
     found in <xref target="RFC3272"/> and <xref target="RFC3209"/>.
   </t>
   <figure anchor="dn_mpls_dp_approach" align="center"
-          title="DetNet adaptation to MPLS data plane">
+          title="DetNet Adaptation to MPLS Data Plane">
     <artwork align="center"><![CDATA[
   DetNet        MPLS
     .
@@ -486,7 +486,7 @@ End System        Node         Node           Node        End System
       </t>
 
       <figure align="center" anchor="fig_ip_pw_detnet"
-              title="DetNet IP over DetNet MPLS Network">
+              title="DetNet IP Over DetNet MPLS Network">
         <artwork><![CDATA[
       DetNet                                         DetNet
 IP    Service         Transit          Transit       Service  IP
@@ -514,7 +514,7 @@ System  |   +--------+       +--------+       +--------+   |  System
       </figure>
 
       <figure align="center" anchor="fig_ip_mpls_detnet"
-              title="Non-DetNet aware IP Over DetNet MPLS Network">
+              title="Non-DetNet Aware IP Over DetNet MPLS Network">
         <artwork><![CDATA[
  IP               Edge                        Edge        IP
  End System       Node                        Node        End System
@@ -640,7 +640,7 @@ title="A TSN over DetNet MPLS Enabled Network">
   </t>
 
   <figure align="center" anchor="fig_8021_detnet"
-  title="IEEE 802.1TSN over DetNet">
+  title="IEEE 802.1TSN Over DetNet">
   <artwork><![CDATA[
      TSN    |<------- End to End DetNet Service ------>|  TSN
     Service |         Transit          Transit         | Service
@@ -668,7 +668,7 @@ System |    +--------+       +--------+       +--------+   |  System
   </section>
   </section>
 
-  <section title="Packet flow example (service protection)">
+  <section title="Packet Flow Example with Service Protection">
 
  <t>
    An example MPLS DetNet network fragment and packet flow is
@@ -676,7 +676,7 @@ System |    +--------+       +--------+       +--------+   |  System
  </t>
 
  <figure align="center" anchor="fig_mpls_example"
-  title="Example Packet flow in DetNet Enabled MPLS Network">
+  title="Example Packet Flow in DetNet Enabled MPLS Network">
  <artwork><![CDATA[
    1      1.1       1.1      1.2.1    1.2.1      1.2.2
 CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
@@ -824,7 +824,7 @@ CE1----EN1--------R1-------R2-------R3--------EN2-----CE2
    L2VPN applications.
   </t>
 
-  <figure title="End-Systems and the DetNet MPLS Domain" anchor="fig_es_connect">
+  <figure title="End-Systems and The DetNet MPLS Domain" anchor="fig_es_connect">
   <artwork align="center"><![CDATA[
 +-----+
 |  X  |                               +-----+
@@ -893,9 +893,9 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
 
 <!-- ================================================================= -->
 
-<section title="MPLS-based DetNet data plane solution" anchor="dn-dt-solution">
+<section title="MPLS-Based DetNet Data Plane Solution" anchor="dn-dt-solution">
 
- <section title="DetNet over MPLS Encapsulation Components" anchor="dn-MPLS-en-comps">
+ <section title="DetNet Over MPLS Encapsulation Components" anchor="dn-MPLS-en-comps">
   <t>
    To carry DetNet over MPLS the following is required:
 
@@ -945,7 +945,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
   </t>
  </section>
 
-  <section title="MPLS data plane encapsulation" anchor="pwSolution">
+  <section title="MPLS Data Plane Encapsulation" anchor="pwSolution">
    <t>
     <xref target="fig_pw_mpls"/> illustrates a DetNet data plane MPLS encapsulation.  The MPLS-based
     encapsulation of the DetNet flows is a good fit for the Layer-2 interconnect deployment cases
@@ -976,7 +976,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
     </list>
    </t>
 
-  <figure title="Encapsulation of a DetNet flow in an MPLS(-TP) PSN" anchor="fig_pw_mpls">
+  <figure title="Encapsulation of a DetNet Flow in an MPLS(-TP) PSN" anchor="fig_pw_mpls">
   <artwork align="center"><![CDATA[
   DetNet MPLS-based encapsulation
 
@@ -1000,7 +1000,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
     </artwork></figure>
 
   </section>
-  <section title="DetNet control word">
+  <section title="DetNet Control Word">
   <t>
    A DetNet control word (d-CW) conforms to the Generic PW MPLS Control Word (PWMCW) defined in
    <xref target="RFC4385"/> and is illustrated in  <xref target="fig_detnet_cw"/>.  The upper nibble
@@ -1187,7 +1187,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
      mentioned in the previous sections.
     </t>
     </section>
-    <section anchor="aggregating-detnet-flows-as-a-new-detnet-flow" title="Aggregating DetNet flows as a new DetNet flow">
+    <section anchor="aggregating-detnet-flows-as-a-new-detnet-flow" title="Aggregating DetNet Flows as a new DetNet flow">
     <t>
      An aggregate can be built by layering DetNet flows as shown below:
     </t>
@@ -1229,7 +1229,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
     </t>
    </section>
 
-   <section anchor="simple-aggregation-at-the-detnet-layer" title="Simple Aggregation at the DetNet layer">
+   <section anchor="simple-aggregation-at-the-detnet-layer" title="Simple Aggregation at the DetNet Layer">
     <t>
     Another approach would be not to include a d-CW for the aggregated flow.
     This would be functionally similar to aggregation at the forwarding sub-layer
@@ -1285,7 +1285,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
     would be severe.
    </t>
 
-   <section title="Edge node processing" anchor="sec_t_pe">
+   <section title="Edge Node Processing" anchor="sec_t_pe">
     <t>
      An edge node is resposable for matching ingress packets to the service they require and
      encapsulating them accordingly.An edge node may participate in the packet replication and
@@ -1337,7 +1337,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
    </section>
 
 
-   <section title="Relay node processing" anchor="sec_s_pe">
+   <section title="Relay Node Processing" anchor="sec_s_pe">
     <t>
      A DetNet Relay node operates in the DetNet forwarding sub-layer . This processing is done within an
      extended forwarder function. Whether an ingress DetNet member flow receives DetNet specific
@@ -1353,7 +1353,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
     </section>
    </section>
 
-<section title="Other DetNet data plane considerations">
+<section title="Other DetNet Data Plane Considerations">
  <section title="Class of Service">
    <t>
      [Editor's note: this section needs to updated to discuss how DetNet service is
@@ -1452,7 +1452,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
   </t>
  </section>
 
- <section title="Cross-DetNet flow resource aggregation" anchor="Aggregation">
+ <section title="Cross-DetNet Flow Resource Aggregation" anchor="Aggregation">
   <t> [Editor's NOTE: Isn't this section the same as "Aggregation at the
   LSP". -- Address as part of aggregation section cleanup.]
   </t>
@@ -1495,7 +1495,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
    </t>
  </section>
 
- <section title="Layer 2 addressing and QoS Considerations">
+ <section title="Layer 2 Addressing and QoS Considerations">
   <t> [Editor's NOTE: review and simplify this section. Doesn't this
   belong in the TSN section? Alternatively, describe in generic/non
   sub-network technology specific terms.]
@@ -1762,7 +1762,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
 <!-- ===================================================================== -->
 
 <section anchor="mpls-over-tsn"
-         title="DetNet MPLS Operation over IEEE 802.1 TSN Sub-Networks">
+         title="DetNet MPLS Operation Over IEEE 802.1 TSN Sub-Networks">
   <t>
   [Editor's note: this is a place holder section.  A standalone section on MPLS over IEEE
   802.1 TSN.  Includes RFC2119 Language.]
@@ -1778,7 +1778,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
 	  Note: in case of MPLS Transit node there is no DetNet Service sub-layer.</t>
 
 <figure align="center" anchor="fig_mpls_detnet_to_tsn"
-              title="DetNet Enabled MPLS Network over a TSN sub-network">
+              title="DetNet Enabled MPLS Network Over a TSN Sub-Network">
 <artwork><![CDATA[
    MPLS (DetNet)                 MPLS (DetNet)
       Node-1                        Node-2
@@ -1878,7 +1878,7 @@ Note: * no service sub-layer for transit nodes
 		</t>
 
 <figure align="center" anchor="fig_mpls_with_tsn"
-              title="MPLS (DetNet) node with TSN functions">
+              title="MPLS (DetNet) Node with TSN Functions">
 <artwork><![CDATA[
    MPLS (DetNet)
       Node-1
@@ -2057,7 +2057,7 @@ Note: * no service sub-layer for transit nodes
 <!-- ===================================================================== -->
 
 
-<section title="Security considerations">
+<section title="Security Considerations">
   <t>
    The security considerations of DetNet in general are discussed in
    <xref target="I-D.ietf-detnet-architecture"/>
@@ -2068,13 +2068,13 @@ Note: * no service sub-layer for transit nodes
 </section>
 
 
-<section anchor="iana" title="IANA considerations">
+<section anchor="iana" title="IANA Considerations">
   <t>
    This document makes no IANA requests.
   </t>
 </section>
 
-<section anchor="contributors" title="Contributors">
+<section anchor="Contributors" title="Contributors">
  <t>RFC7322 limits the number of authors listed on the front page of a draft to a maximum of 5,
   far fewer than the many individuals below who made important contributions to this draft. The
   editor wishes to thank and acknowledge each of the following authors for contributing text to
@@ -2168,7 +2168,7 @@ Note: * no service sub-layer for transit nodes
 </middle>
 
 <back>
-  <references title="Normative references">
+  <references title="Normative References">
    &rfc2119;
    <?rfc include="reference.RFC.2211"?>
    <?rfc include="reference.RFC.2212"?>
@@ -2190,7 +2190,7 @@ Note: * no service sub-layer for transit nodes
    <?rfc include="reference.RFC.8174"?>
    &I-D.ietf-spring-segment-routing-mpls;
   </references>
-  <references title="Informative references">
+  <references title="Informative References">
    <?rfc include="reference.RFC.2205"?>
    <?rfc include="reference.RFC.3272"?>
    &rfc3985;
@@ -2295,7 +2295,7 @@ Note: * no service sub-layer for transit nodes
    </reference>
 
   </references>
- <section title="Example of DetNet data plane operation" anchor="sec_comb">
+ <section title="Example of DetNet Data Plane Operation" anchor="sec_comb">
   <t>
    [Editor's note: Add a simplified example of DetNet data plane and how labels etc
    work in the case of MPLS-based PSN and utilizing PREOF. The figure is subject
