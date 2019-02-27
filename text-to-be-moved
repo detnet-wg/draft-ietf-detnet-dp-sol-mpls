@@ -1,0 +1,266 @@
+      
+ <section title="DetNet domain specific considerations">
+
+  <t> From a connection type perspective, three scenarios are distinguished:
+    <list style="numbers">
+	<t>
+     Directly attached: end-system is directly connected to an edge node.
+    </t>
+	<t>
+     Indirectly attached: end-system is behind a (L2-TSN / L3-DetNet)
+     sub-network.
+    </t>
+	<t>
+     DN integrated: end-system is part of the DetNet domain.
+    </t>
+    </list>
+  </t>
+
+  <t>
+   L3 end-systems may use any of these connection types, however L2 end-systems
+   may use only the first two (directly or indirectly attached). DetNet domain
+   MUST allow communication between any end-systems of the same type (L2-L2,
+   L3-L3), independent of their connection type and DetNet capability. However
+   directly attached and indirectly attached end-systems have no knowledge about
+   the DetNet domain and its encapsulation format at all. See <xref target="fig_es_con_types"/>
+   for L3 end-system scenarios.
+  </t>
+
+  <figure title="Connection types of L3 end-systems" anchor="fig_es_con_types">
+  <artwork align="center"><![CDATA[
+                                   ____+----+
+           +----+        _____    /    | ES3|
+           | ES1|____   /     \__/     +----+___
+           +----+    \ /                        \
+                      +                          |
+              ____     \                        _/
++----+     __/    \     +__    DetNet domain   /
+| ES2|____/  L2/L3 |___/   \         __     __/
++----+    \_______/         \_______/  \___/
+
+  ]]>
+    </artwork></figure>
+
+
+ <section title="DetNet Layer Two Service">
+
+  <t>
+   The simplest DetNet service is to provide tunneling for layer two,
+   where the connected hosts are in the same broadcast (BC) domain. Forwarding
+   over the DetNet domain is based on L2 (MAC) addresses (i.e. dst-MAC),
+   or on received interface <xref target="RFC3985"/>. In both cases
+   the L2 headers MUST either be kept, or provision must be made for their
+   reconstruction at egress from the DetNet domain.
+  </t>
+
+  <figure title="Encapsulation format for DetNet Layer Two Service" anchor="fig_encap_DN_bridging">
+  <artwork align="center"><![CDATA[
+                     +------+
+                     |  X   |
+            +------+ +------+
+            |  X   | |  IP  |
+            +------+ +------+
+End-system  |  L2  | |  L2  |
+      +-----+======+-+======+--+------+
+DetNet tunnel                  | Shim |
+                               +------+
+                               | MPLS |
+                               +------+
+                               |  L2  |
+                               +------+
+
+Examples:
+
+                      +------+  +------+
+                      |  X   |  |  X   |
+            +------+  +------+  +------+
+            |  X   |  |  IP  |  |  IP  |
+            +------+  +------+  +------+
+            |  L2  |  |  L2  |  |  L2  |
+      +-----+======+--+======+--+======+-----+
+            | d-CW |  | d-CW |  | d-CW |
+            +------+  +------+  +------+
+            | MPLS |  | MPLS |  | MPLS |
+            +------+  +------+  +------+
+            |  L2  |  |  L2  |  | UDP  |
+            +------+  +------+  +------+
+                                |  IP  |
+                                +------+
+                                |  L2  |
+                                +------+
+  ]]>
+    </artwork></figure>
+
+  <t>
+   As shown in <xref target="fig_encap_DN_bridging"/> both L2 and L3 end-systems
+   can be served by such a DetNet L2  encapsulation service.
+   This encapsulation service may be carried over MPLS natively  <xref target="pwSolution"/>, or over MPLS over IP
+   <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>.
+  </t>
+  </section>
+
+ <section title="DetNet Routing Service (IP over MPLS)" anchor="detrouting">
+
+  <t>
+   IP traffic and IP DetNet flows, see <xref
+   target="I-D.ietf-detnet-dp-sol-ip"/>, can be carried over a DetNet
+   MPLS domain.  In such cases, the IP headers are modified per standard
+   router behavior, e.g., TTL handling. <xref target="fig_mpls_DN_routing"/> shows the
+   encapsulation of an IP flow over MPLS as well as when MPLS is carried
+   over an IP PSN, see <xref target="detnet-data-plane-encapsulation-for-ip-transport-networks"/>.
+  </t>
+
+  <figure title="Encapsulation format for DetNet Routing in MPLS PSN for L3 end-systems" anchor="fig_mpls_DN_routing">
+  <artwork align="center"><![CDATA[
+
+
+            +------+
+            |  X   |
+            +------+
+End-system  |  IP  |
+      +-----+======+--+------+
+DetNet tunnel         | Shim |
+                      +------+
+                      | MPLS |
+                      +------+
+                      |  L2  |
+                      +------+
+
+Examples:
+
+            +------+  +------+
+            |  X   |  |  X   |
+            +------+  +------+
+            |  IP  |  |  IP  |
+      +-----+======+--+======+-----+
+            | d-CW |  | d-CW |
+            +------+  +------+
+            | MPLS |  | MPLS |
+            +------+  +------+
+            |  L2  |  | UDP  |
+            +------+  +------+
+                      |  IP  |
+                      +------+
+                      |  L2  |
+                      +------+
+  ]]>
+  </artwork></figure>
+
+ </section>
+</section>
+
+
+
+<section title="DetNet Inter-Working Function (DN-IWF)">
+
+<section title="Networks with multiple technology segments" anchor="nwsegments">
+
+  <t>
+   There are networking scenarios, where the DetNet domain contains multiple technology segments (IP,
+   MPLS, ..) and all those segments are under the same administrative control (see <xref
+   target="fig_pref_xcrs_segments"/>). Furthermore, DetNet nodes may be interconnected via TSN
+   segments.
+  </t>
+
+  <t> An important aspect of DetNet network design is the placement of DetNet functions across the
+  domain. Designs based on segment-by-segment optimization can provide only sub-optimal solutions. In
+  order to achieve global optimized Inter-Working Functions (DN-IWF) can be
+  placed at segment edge
+  nodes, which stitch together DetNet flows across connected segments.    </t>
+
+  <t> DN-IWF may ensure that flow attributes are correlated across segment edges. For example,
+  there are two DetNet functions which require Sequence Numbers: (1) PEF: removes duplications
+  from flows and (2) POF: ensures in-order-delivery of packet in a flow. Stitching flows together
+  and correlating attributes means for example that replication of packets can happen in one segment
+  and elimination of duplicates in a different one.   </t>
+
+  <figure title="Optimal replication and elimination placement across technology segments example" anchor="fig_pref_xcrs_segments">
+  <artwork align="center"><![CDATA[
+                                   ______
+                         ____     /      \__
+            ____        /     \__/          \___   ______
++----+   __/    +======+                       +==+      \     +----+
+|src |__/  Seg1  )     |                       |  \  Seg3 \____| dst|
++----+  \_______+      \       Segment-2       |   \+_____/    +----+
+                 \======+_                    _+===/
+                          \         __     __/
+                           \_______/  \___/
+
+
+                                       +------------+
+             +---------------E----+    |            |
++----+       |               |    +----R---+        |          +----+
+|src |-------R           +---+             |        E----------+ dst|
++----+       |           |                 E--------+          +----+
+             +-----------R                 |
+                         +-----------------+
+  ]]>
+    </artwork></figure>
+
+</section>
+<section title="DN-IWF related considerations">
+
+  <t> The goal of DN-IWF is to (1) match and (2) translate segment specific flow attributes. The DN-IWF ensures that segment specific attributes comprise per domain unique attributes for the whole DetNet domain. This characteristic can ensure that DetNet functions can be based on per domain attributes and not per segment attributes.
+  </t>
+
+  <t> The two DetNet specific attributes have the following characteristics:
+  <list style="symbols">
+   <t> Flow-ID: it is same in all packets of a flow </t>
+   <t> Sequence Number: it is different packet-by-packet </t>
+  </list>
+  </t>
+
+  <t> For the Flow-ID the DN-IWF can implement a static mapping. The situation is more complicated for Sequence Number as it is different packet-by-packet, so it may need more sophisticated translation unless its format is exactly the same in the two technology segments. In this later case the DN-IWF can simple copy the Sequence Number field between the tunneling encapsulation of the two technology segments.
+  </t>
+
+  <t> In case of three technology segments (IP, MPLS and TSN) three DN-IWF functions can be specified. In the rest of this section the focus is on the (1) IP - MPLS network scenario. Note: the use-cases are out-of-scope for (2) TSN - IP, (3) TSN - MPLS.
+  </t>
+
+  <t> Simplest implementation of DN-IWF is provided if the flow attributes have the same format. Such a common denominator of the tunnel encapsulation format is the pseudowire encapsulation over both IP and MPLS.
+  </t>
+
+  <figure title="FIGURE Placeholder PW over X" anchor="fig_pwox_enc">
+  <artwork align="center"><![CDATA[
+   +--------+
+   |        |
+   | X    X |
+   |  ____  |
+   | /    \ |
+   |        |
+   |/\/\/\/\|
+
+      Oops!
+ 404 Not Found
+  ]]>
+    </artwork></figure>
+
+    <t>
+      [Editor's note: Where is the text describing how 802.1 TSN Streams are
+      mapping to DetNet services/flows. i.e., EVPN+]
+    </t>
+</section>
+
+
+</section>
+
+</section>
+
+<!-- ===================================================================== -->
+
+<section anchor="ip-over-detnet"
+         title="DetNet IP Operation over DetNet MPLS Service">
+  <t>
+  [Editor's note: this is a place holder section.  A standalone section on
+  operation of IP flows over DetNet MPLS data plane.  Includes RFC2119 Language.]
+  </t>
+</section>
+
+<!-- ===================================================================== -->
+
+<section anchor="tsn-over-detnet"
+         title="IEEE 802.1 TSN Interconnection over DetNet MPLS Service">
+  <t>
+  [Editor's note: this is a place holder section.  A standalone section on TSN
+  "island" interconnect over DetNet".  Includes RFC2119 Language.]
+  </t>
+</section>
