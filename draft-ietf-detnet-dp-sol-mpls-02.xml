@@ -1083,7 +1083,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
     that only one encapsulation type will be present for each DetNet flow.
     Of course, if for some reason the multiple encapsulations are needed
     to support a single DetNet service, multiple S-Labels will be
-    required for that service.  Note that in the unlikely case that Ipv4
+    required for that service.  Note that in the unlikely case that IPv4
     and IPv6 will map to the same DetNet flow, different S-Labels will be
     needed to differentiate between the versions of IP.
    </t>
@@ -1706,7 +1706,8 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
   <t>
     While the MPLS data plane must support bidirectional DetNet flows,
     there are no special bidirectional features with respect to the data plane
-    other than the need for the two directions take the same paths.  Fate sharing
+    other than the need for the two directions of a co-routed
+    bidirectional flow to take the same path.  Fate sharing
     and associated vs co-routed bidirectional flows can be managed at the
     control level.  Note that there is no stated requirement for bidirectional
     DetNet flows to be supported using the same MPLS Labels
