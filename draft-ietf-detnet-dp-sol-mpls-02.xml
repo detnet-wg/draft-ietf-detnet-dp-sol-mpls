@@ -987,7 +987,8 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
 ]]>
     </artwork></figure>
 
-  <section title="DetNet Control Word and the DetNet Sequence Number">
+  <section title="DetNet Control Word and the DetNet Sequence Number"
+           anchor="dn-sn">
   <t>
    A DetNet control word (d-CW) conforms to the Generic PW MPLS Control
    Word (PWMCW) defined in <xref target="RFC4385"/>. The d-CW formatted
@@ -1044,10 +1045,15 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
     MUST be set to zero (0). This values carried in this field can wrap
     and it is important to note that zero (0) is a valid field value.
     For example, were the sequence number size is 16 bits, the sequence
-    will contain: 65535, 0, 1. In this case zero is an ordinary sequence
-    number. This differs from <xref target="RFC4448"/> where a sequence
-    number of zero does not indicate that no sequence number field value
-    is in use.
+    will contain: 65535, 0, 1. In this case, zero (0) is an ordinary
+    sequence number. This differs from <xref target="RFC4448"/> where a
+    sequence number of zero (0) does not indicate that no sequence
+    number field value is in use.
+  </t>
+  <t>
+    The sequence number is optionally used during receive processing as
+    described below in <xref target="pef-requirements"/> and <xref
+    target="pof-requirements"/>.
   </t>
   </section>
   <section anchor="flow-identification" title="S-Labels">
@@ -1082,10 +1088,91 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
    all of the packets sent using a specific S-Label to force the flow to follow the
    same path.   However, as previously stated in <xref target="dn-gen-encap-solution"/>, the use of ECMP in a DetNet domain is NOT RECOMMENDED.
    </t>
-   <section anchor="peof-requirements" title="Packet Ordering and
-                                              Elimination Function Processing">
+   <t>
+     When receiving a DetNet MPLS flow, an implementation MUST identify
+     the app flow associated with the incoming packet based on the
+     S-Label.  When a node is using platform labels for S-Labels, no
+     additional information is needed as the S-label uniquely identifies
+     the app flow.  In the case where platform labels are not used, one
+     or more F-Labels proceeding the S-Label MUST be used together with
+     the S-Label to uniquely identify the incoming app-flows. When PHP
+     is used, the incoming interface MAY also be used to together with
+     any present F-Label(s) and the S-Label to uniquely identify an
+     incoming app-flows.  Note that choice to use platform label space
+     for S-Label or S-Label plus one or more F-Labels to identify app
+     flows is a local implementation choice, with one caveat.  When one
+     or more F-labels, or incoming interface, is needed together with an
+     S-Label to uniquely identify, the controller plane MUST ensure that
+     incoming DetNet MPLS packets arrive with the needed information
+     (F-label(s) and/or incoming interface); the details of such are
+     outside the scope of this document.
+   </t>
+   <t>
+     While NOT REQUIRED, the use of platform labels for S-Labels matches
+     other pseudowire encapsulation.  This implementation choice also
+     impacts PEF and POF processing as described in the next section.
+   </t>
+   <section anchor="pef-requirements" title="Packet Elimination Function
+                                             Processing">
      <t>
-       [Authors note: Required PEOF processing goes here!!!]
+       Implementations MAY support the Packet Elimination Function (PEF)
+       for received DetNet MPLS flows.  When supported, use of the PEF
+       for a particular app flow MUST be provisioned via configuration
+       and the controller plane, see <xref target="cp_considerations"/>.
+     </t>
+     <t>
+       After an app flow is identified for a received DetNet MPLS
+       packet, as described above, an implementation MUST check if PEF
+       is configured for that app flow.  When configured the
+       implementation MUST track the sequence number contained in
+       received d-CWs and MUST ensure that duplicate (replicated)
+       instances of a particular sequence number are discarded.  The
+       specific mechanisms used for an implementation to identify which
+       received packets are duplicates and which are new is an
+       implementation choice.  Note that per <xref target="dn-sn"/>
+       the sequence number field length may be 16 or 28 bits, and the
+       field value can wrap.
+     </t>
+     <t>
+       Note that an implementation MAY wish to constrain the maximum
+       number sequence numbers that are tracked, on platform-wide or per
+       flow basis.  Some implementations MAY support the provisioning of
+       this number on either a platform-wide or per flow basis.
+     </t>
+   </section>
+   <section anchor="pof-requirements" title="Packet Ordering Function
+                                             Processing">
+     <t>
+       A function that is related to PEF is the Packet Ordering Function
+       (POF).  In addition to PEF, implementations MAY support POF. When
+       supported, use of the POF for a particular app flow MUST be
+       provisioned via configuration and the controller plane, see <xref
+       target="cp_considerations"/>.  Implementations MAY required that
+       PEF and POF be used in combination.  There is no requirement
+       related to the order of execution of the Packet Elimination and
+       Ordering Functions in an implementation.
+     </t>
+     <t>
+       After an app flow is identified for a received DetNet MPLS
+       packet, as described above, an implementation MUST check if POF
+       is configured for that app flow.  When configured the
+       implementation MUST track the sequence number contained in
+       received d-CWs and MUST ensure that packets are processed in the
+       order indicated in the received d-CW sequence number field, which
+       may not be in the order the packets are received. As defined in
+       <xref target="dn-sn"/> the sequence number field length may be 16
+       or 28 bits, is incremened by one (1) for each new app flow packet
+       sent, and the field value can wrap.  The specific mechanisms used
+       for an implementation to identify the order of received packets
+       is an implementation choice.
+     </t>
+     <t>
+       Note that an implementation MAY wish to constrain the maximum
+       number of out of order packets that can be processed, on
+       platform-wide or per flow basis.  Some implementations MAY
+       support the provisioning of this number on either a platform-wide
+       or per flow basis.  The number of out of order packets that can
+       be processed also impacts the latency of a flow.
      </t>
    </section>
   </section>
@@ -1141,8 +1228,8 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
        below in <xref target="f-labels-all"/>.
      </t>
      <t>
-       When receiving a DetNet MPLS flow, an implementation MUST
-       identify the app flow associated with the incoming packet based
+       As described in the previous section, when receiving a DetNet MPLS flow, an implementation
+       identifies the app flow associated with the incoming packet based
        on the S-Label.  When a node is using platform labels for
        S-Labels, any F-Labels can be popped and the S-label uniquely
        identifies the app flow.  In the case where platform labels are
