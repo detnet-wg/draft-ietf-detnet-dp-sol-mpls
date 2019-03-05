@@ -65,9 +65,15 @@
   o Aggregation section needs to be cleaned up
   o check conformance language in MPLS over TSN section
 
-  OPEN Questions:
+  Resolved in Mar 5
   - need for S-Labels to be from platform label space (Andy)
+    Pattern after e-vpn where stack is provided by downstream receiver
   - Different S-Labels for same application flow (Balazs)
+    clarify that service sub-layer nodes can change s-labels
+
+  Open
+  - s/MPLS DetNet/DetNet MPLS
+  move 
 -->
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 <?rfc toc="yes"?>
@@ -438,7 +444,9 @@ System  |    +--------+       +--------+       +--------+   | System
 
     <section title="IP Over MPLS DetNet Data Plane Scenarios"
              anchor="sec_ip_mpls_dt_dp_scen">
-
+      <t>
+        [Author's note: this section to be moved to IP sol draft]
+      </t>
       <figure align="center" anchor="fig_dn_ip_mpls_detnet"
               title="DetNet (DN) IP Over MPLS Network">
         <artwork><![CDATA[
@@ -583,6 +591,9 @@ System  |    +--------+       +--------+       +--------+   | System
   </section>
   <section title="IEEE 802.1 TSN Over MPLS DetNet Data Plane Scenario"
              anchor="sec_tsn_mpls_dt_dp_scen">
+      <t>
+        [Author's note: this section to be moved to TSN over mpls sol draft]
+      </t>
 
 
 <figure anchor="fig_tsn_mpls_detnet" align="center"
@@ -596,7 +607,7 @@ title="A TSN over DetNet MPLS Enabled Network">
 |   Appl.  |<-:Svc Proxy:--End to End Svc.--:Svc Proxy:->|   Appl.  |
 +----------+  +---------+                   +---------+  +----------+
 |    TSN   |  |TSN| |Svc|<-- DetNet flow -->|Svc| |TSN|  |    TSN   |
-+----------+  +---+ +---+    +----------+   +---------+  +----------+
++----------+  +---+ +---+    +----------+   +---+ +---+  +----------+
 |Forwarding|  |Fwd| |Fwd|    |Forwarding|   |Fwd| |Fwd|  |Forwarding|
 +------.---+  +--.+ +-.-+    +---.----.-+   +--.+ +-.-+  +----.-----+
        :   Link  :    /  ,-----.  \   :  Link  :   /  ,-----.  \
@@ -992,7 +1003,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
    A DetNet control word (d-CW) conforms to the Generic PW MPLS Control
    Word (PWMCW) defined in <xref target="RFC4385"/>. The d-CW formatted
    as shown in <xref target="fig_detnet_cw"/> MUST be present in all
-   DetNet packets containing App-Flow data.
+   DetNet packets containing app-flow data.
   </t>
     <figure title="DetNet Control Word" anchor="fig_detnet_cw">
     <artwork align="center"><![CDATA[
@@ -1027,7 +1038,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
    </list>
    The sequence number length MUST be provisioned (configured) on a per
    app-flow basis via
-   configuration and the controller plane, see <xref
+   configuration, e.g., the controller plane described in <xref
    target="cp_considerations"/>.
   </t>
   <t>
@@ -1058,15 +1069,16 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
   <section anchor="flow-identification" title="S-Labels">
    <t>
     App-flow identification at a DetNet service sub-layer is realized by
-    an S-Label.  Each App-Flow MUST be sent by the node that adds a d-CW
+    an S-Label.  Each app-flow MUST be sent by the node that adds a d-CW
     with a single specific S-Label value.  MPLS-aware DetNet end systems
     and edge nodes, which are by definition MPLS ingress and egress
     nodes, MUST add and remove the d-CW and S-Label.  Relay nodes MAY
     swap S-Label values when processing an app-flow.
    </t>
    <t>
-    The S-Label value MUST be provisioned per app-flow via configuration
-    and the controller plane, see <xref target="cp_considerations"/>.
+    The S-Label value MUST be provisioned per app-flow via
+    configuration, e.g., via
+    the controller plane described in <xref target="cp_considerations"/>.
     Note that S-Labels provide app-flow identification at the downstream
     DetNet service sub-layer receiver, not the sender.  As such,
     S-Labels MUST be allocated by the entity that controls the service
@@ -1092,10 +1104,10 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
    </t>
    <t>
      When receiving a DetNet MPLS flow, an implementation MUST identify
-     the app flow associated with the incoming packet based on the
+     the app-flow associated with the incoming packet based on the
      S-Label.  When a node is using platform labels for S-Labels, no
      additional information is needed as the S-label uniquely identifies
-     the app flow.  In the case where platform labels are not used, one
+     the app-flow.  In the case where platform labels are not used, one
      or more F-Labels proceeding the S-Label MUST be used together with
      the S-Label to uniquely identify the incoming app-flows. When PHP
      is used, the incoming interface MAY also be used to together with
@@ -1111,7 +1123,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
    </t>
    <t>
      While NOT REQUIRED, the use of platform labels for S-Labels matches
-     other pseudowire encapsulation.  This implementation choice also
+     other pseudowire encapsulations.  This implementation choice also
      impacts PEF and POF processing as described in the next section.
    </t>
    <section anchor="pef-requirements" title="Packet Elimination Function
@@ -1119,13 +1131,13 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
      <t>
        Implementations MAY support the Packet Elimination Function (PEF)
        for received DetNet MPLS flows.  When supported, use of the PEF
-       for a particular app flow MUST be provisioned via configuration
-       and the controller plane, see <xref target="cp_considerations"/>.
+       for a particular app-flow MUST be provisioned via configuration,
+       e.g., via the controller plane described in <xref target="cp_considerations"/>.
      </t>
      <t>
-       After an app flow is identified for a received DetNet MPLS
+       After an app-flow is identified for a received DetNet MPLS
        packet, as described above, an implementation MUST check if PEF
-       is configured for that app flow.  When configured the
+       is configured for that app-flow.  When configured the
        implementation MUST track the sequence number contained in
        received d-CWs and MUST ensure that duplicate (replicated)
        instances of a particular sequence number are discarded.  The
@@ -1148,23 +1160,24 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
      <t>
        A function that is related to PEF is the Packet Ordering Function
        (POF).  Implementations MAY support POF. When
-       supported, use of the POF for a particular app flow MUST be
-       provisioned via configuration and the controller plane, see <xref
+       supported, use of the POF for a particular app-flow MUST be
+       provisioned via configuration, e.g., via the controller plane
+       described by <xref
        target="cp_considerations"/>.  Implementations MAY required that
        PEF and POF be used in combination.  There is no requirement
        related to the order of execution of the Packet Elimination and
        Ordering Functions in an implementation.
      </t>
      <t>
-       After an app flow is identified for a received DetNet MPLS
+       After an app-flow is identified for a received DetNet MPLS
        packet, as described above, an implementation MUST check if POF
-       is configured for that app flow.  When configured the
+       is configured for that app-flow.  When configured the
        implementation MUST track the sequence number contained in
        received d-CWs and MUST ensure that packets are processed in the
        order indicated in the received d-CW sequence number field, which
        may not be in the order the packets are received. As defined in
        <xref target="dn-sn"/> the sequence number field length may be 16
-       or 28 bits, is incremened by one (1) for each new app flow packet
+       or 28 bits, is incremened by one (1) for each new app-flow packet
        sent, and the field value can wrap.  The specific mechanisms used
        for an implementation to identify the order of received packets
        is an implementation choice.
@@ -1200,8 +1213,8 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
          When sending a DetNet flow, Zero or more F-Labels MAY be added
          on top of an S-Label by the node pushing an S-Label. The
          F-Labels to be pushed when sending a particular app-flow MUST
-         be provisioned per app-flow via configuration and the
-         controller plane, see <xref target="cp_considerations"/>.  To
+         be provisioned per app-flow via configuration, e.g., via the
+         controller plane discussed in <xref target="cp_considerations"/>.  To
          allow for the omission of F-Labels, an implementation SHOULD
          also allow an outgoing interface to be provisioned.
      </t>
@@ -1234,14 +1247,14 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
      </t>
      <t>
        As described in the previous section, when receiving a DetNet MPLS flow, an implementation
-       identifies the app flow associated with the incoming packet based
+       identifies the app-flow associated with the incoming packet based
        on the S-Label.  When a node is using platform labels for
        S-Labels, any F-Labels can be popped and the S-label uniquely
-       identifies the app flow.  In the case where platform labels are
+       identifies the app-flow.  In the case where platform labels are
        not used, F-Label(s) MUST also be provisioned for incoming
        app-flows. When PHP is used, incoming interface MUST be
        provisioned.  The provisioned information MUST then be used to
-       identify incoming app flows based on the combination of S-Label
+       identify incoming app-flows based on the combination of S-Label
        and F-Label(s) or incoming interface.
      </t>
      </section>
@@ -1254,7 +1267,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
          push, pop and swap operations.  Such processing is essentially
          the same type of processing enabled for TE LSPs, although the
          specific service parameters, or traffic specification, can
-         differ.  When the DetNet service parameters of the app flow or
+         differ.  When the DetNet service parameters of the app-flow or
          flows carried in an LSP represented by an F-Label can be met by
          an exiting TE mechanism, the forwarding sub-layer processing
          node MAY be a DetNet unaware, i.e., standard, MPLS LSR.  Such
@@ -2234,7 +2247,7 @@ Note: * no service sub-layer required for transit nodes
  <artwork align="center"><![CDATA[
 +---------------------------------+
 |                                 |
-|         DetNet App Flow         |
+|         DetNet App-Flow         |
 |         Payload  Packet         |
 |                                 |
 +---------------------------------+ <--\
@@ -2279,10 +2292,10 @@ Note: * no service sub-layer required for transit nodes
     S-Labels are taken from platform label space, all that is required
     is to provision that receiving IP/UDP encapsulated DetNet MPLS
     packets is permitted.  Once the IP/UDP header is stripped, the
-    S-label uniquely identifies the app flow.  When S-Labels are not
+    S-label uniquely identifies the app-flow.  When S-Labels are not
     taken from platform label space, IP/UDP header information MUST be
     provisioned.  The provisioned information MUST then be used to
-    identify incoming app flows based on the combination of S-Label and
+    identify incoming app-flows based on the combination of S-Label and
     incoming IP/UDP header.  Normal receive processing, including PEOF
     can then take place.
   </t>
