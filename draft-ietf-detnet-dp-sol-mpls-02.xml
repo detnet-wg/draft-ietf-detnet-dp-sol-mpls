@@ -1327,8 +1327,8 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
        </t>
        <t>
          Subsequent sections provide additional considerations related
-         to CoS (<xref target="CoS"/>, QoS (<xref target="QoS"/> and
-         aggregation (<xref target="Aggregation"/>.
+         to CoS (<xref target="CoS"/>), QoS (<xref target="QoS"/>) and
+         aggregation (<xref target="Aggregation"/>).
        </t>
      </section>
    </section>
