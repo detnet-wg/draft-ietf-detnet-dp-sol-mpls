@@ -58,12 +58,16 @@
 ]>
 <!--
 - From 2/25 call:
-  o finish discussed split/removal of foo (IP and TSN) over MPLS (Lou)
+  o finish discussed split/removal of foo (IP and TSN) over MPLS (Lou) <done>
   After: All to
   o identify missing conformance language, notably WRT forwarding
     sub-layer
   o Aggregation section needs to be cleaned up
   o check conformance language in MPLS over TSN section
+
+  OPEN Questions:
+  - need for S-Labels to be from platform label space (Andy)
+  - Different S-Labels for same application flow (Balazs)
 -->
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 <?rfc toc="yes"?>
@@ -422,11 +426,6 @@ System  |    +--------+       +--------+       +--------+   | System
 ]]></artwork>
 </figure>
 
-
-    <t>
-      [Authors note: TBD - should the rest of this section be cut?]
-    </t>
-
     <t>
       As previously mentioned, this document specifies how MPLS is used
       to support DetNet flows using an MPLS data plane as well as how
@@ -596,7 +595,7 @@ title="A TSN over DetNet MPLS Enabled Network">
 +----------+  +.........+                   +.........+  +----------+
 |   Appl.  |<-:Svc Proxy:--End to End Svc.--:Svc Proxy:->|   Appl.  |
 +----------+  +---------+                   +---------+  +----------+
-|    TSN   |  |TSN| |Svc|<-- DetNet flow -->: Service :->|    TSN   |
+|    TSN   |  |TSN| |Svc|<-- DetNet flow -->|Svc| |TSN|  |    TSN   |
 +----------+  +---+ +---+    +----------+   +---------+  +----------+
 |Forwarding|  |Fwd| |Fwd|    |Forwarding|   |Fwd| |Fwd|  |Forwarding|
 +------.---+  +--.+ +-.-+    +---.----.-+   +--.+ +-.-+  +----.-----+
@@ -613,7 +612,7 @@ title="A TSN over DetNet MPLS Enabled Network">
    <xref target="fig_tsn_mpls_detnet"/> shows IEEE 802.1 TSN end
    stations operating over a TSN aware DetNet service running over an
    MPLS network.  DetNet Edge Nodes sit at the boundary of a DetNet
-   domain. They are responsible for mapping non-DetNet aware traffic to
+   domain. They are responsible for mapping non-DetNet aware L2 traffic to
    DetNet services.  They also support the imposition and disposition of
    the required DetNet encapsulation.  These are functionally similar to
    pseudowire (PW) Terminating Provider Edge (T-PE) nodes which use
@@ -1086,7 +1085,10 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
    label stack in networks where DetNet flows would otherwise received ECMP treatment.
    When ELs are used, the same EL value SHOULD be used for
    all of the packets sent using a specific S-Label to force the flow to follow the
-   same path.   However, as previously stated in <xref target="dn-gen-encap-solution"/>, the use of ECMP in a DetNet domain is NOT RECOMMENDED.
+   same path.   However, as previously stated in <xref
+   target="dn-gen-encap-solution"/>, the use of ECMP for DetNet flows is
+   NOT RECOMMENDED. ECMP MAY be used for non-DetNet flows within a
+   DetNet domain.
    </t>
    <t>
      When receiving a DetNet MPLS flow, an implementation MUST identify
@@ -1137,14 +1139,15 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
        Note that an implementation MAY wish to constrain the maximum
        number sequence numbers that are tracked, on platform-wide or per
        flow basis.  Some implementations MAY support the provisioning of
-       this number on either a platform-wide or per flow basis.
+       the maximum number sequence numbers that are tracked number on
+       either a platform-wide or per flow basis.
      </t>
    </section>
    <section anchor="pof-requirements" title="Packet Ordering Function
                                              Processing">
      <t>
        A function that is related to PEF is the Packet Ordering Function
-       (POF).  In addition to PEF, implementations MAY support POF. When
+       (POF).  Implementations MAY support POF. When
        supported, use of the POF for a particular app flow MUST be
        provisioned via configuration and the controller plane, see <xref
        target="cp_considerations"/>.  Implementations MAY required that
@@ -1183,7 +1186,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
        sub-layer processing nodes.
      </t>
      <section anchor="f-labels-ssl"
-              title="Service Sub-Layer Processing Node Processing">
+              title="Service Sub-Layer and Packet Replication Function Processing">
        
        <t>
          DetNet MPLS end systems, edge nodes and relay nodes may operate
@@ -1309,7 +1312,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
              DetNet flow.
            </t>
            <t>
-             MUST ensure a QoS flow exceeds its allocated resources or
+             MUST ensure a QoS flow does not exceed its allocated resources or
              provisioned service level,
            </t>
            <t>
