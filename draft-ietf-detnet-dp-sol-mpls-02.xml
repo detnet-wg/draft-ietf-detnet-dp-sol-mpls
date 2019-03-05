@@ -1212,7 +1212,9 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
        forwarding sub-layer LSPs.  To support PRF an implementation MUST
        support the setting of different sets of F-Labels.  Hereto, to
        allow for the omission of F-Labels, an implementation SHOULD also
-       allow multiple outgoing interfaces to be provisioned.
+       allow multiple outgoing interfaces to be provisioned. PRF MUST
+       NOT be used with app-flows configured with a d-CW sequence number
+       field length of 0 bits.
      </t>
      <t>
        When a single set of F-Labels is provisioned for a particular
