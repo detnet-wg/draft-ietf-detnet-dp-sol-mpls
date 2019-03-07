@@ -1875,7 +1875,8 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
      uses one or more F-Labels to forward DetNet packets between
      DetNet service-aware nodes along explicitly defined routes at the
      DetNet forwarding sub-layer, which in the context of this document is
-     the MPLS layer.  In the DetNet Forwarding (MPLS) sub-layer the explicit
+     the MPLS layer.  F-Labels can also provide context for an S-Label.
+     In the DetNet Forwarding (MPLS) sub-layer the explicit
      route consists of the set of DetNet nodes which are LSRs, links,
      and possibly link bundle members and queues that the DetNet packets
      of a flow must traverse between nodes in the DetNet service sub-layer
@@ -1886,7 +1887,11 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
      not include aggregation, is required at this sub-layer. Explicit
      routes are used to ensure that packets are routed through the
      resources that have been reserved for them, and hence provide the
-     DetNet application with the required service.
+     DetNet application with the required service.  Multiple F-Labels
+     may be pushed after an S-Label and there is no requirement for all
+     F-Labels to be controlled via the same controller mechanisms. For
+     example in EVPN, some labels are distributed using BGP while others
+     are distributed using LDP or RSVP. 
    </t>
    <t>
     Whether configuring, calculating and instantiating these routes is a
@@ -2005,7 +2010,7 @@ Sub-Network        |  L2  |  | TSN  |  | UDP  |
    <t>Manage DetNet S-Label and F-Label allocation and distribution, when the DetNet MPLS encapsulation is in use</t>
    <t>The ability to support DetNet flow aggregation</t>
    <t>Advertise static and dynamic node and link resources such as capabilities and adjacencies to other network nodes (for dynamic signaling approaches) or to network controllers (for centralized approaches)</t>
-   <t>Scale to handle a large number of DetNet flows in a domain (which may require per-flow signaling or provisioning)</t>
+   <t>Scale to handle the number of DetNet flows expected in a domain (which may require per-flow signaling or provisioning)</t>
    <t>Provision flow identification information at each of the nodes along the path, and it may differ depending on the location in the network and the DetNet functionality (e.g. transit node vs. relay node).</t>
   </list> </t>
   <t>
