@@ -432,11 +432,12 @@ System  |    +--------+       +--------+       +--------+   | System
     <t>
       As previously mentioned, this document specifies how MPLS is used
       to support DetNet flows using an MPLS data plane as well as how
-      such can be mapped to IEEE 802.1 TSN and IP DetNet PSNs.  In the
-      remainder of this section, sample uses of DetNet MPLS are shown
-      for illustrative purposes.  These uses are an IP DetNet, where the
-      end nodes support <xref target="I-D.ietf-detnet-dp-sol-ip"/>, and
-      an L2VPN service, where the L2 is itself an IEEE 802.1 TSN.
+      such can be mapped to IEEE 802.1 TSN and IP DetNet PSNs. An
+      equally import scenario is when IP is supported over DetNet MPLS
+      and this is covered in <xref
+      target="I-D.ietf-detnet-dp-sol-ip"/>.  Another important scenario
+      is where an Ethernet Layer 2 service is supported over DetNet MPLS
+      and this is covered in [TBD-TSN-OVER-DETNET].
     </t>
 
     <section title="IP Over DetNet MPLS Data Plane Scenarios"
@@ -589,7 +590,8 @@ System  |    +--------+       +--------+       +--------+   | System
   <section title="IEEE 802.1 TSN Over DetNet MPLS Data Plane Scenario"
              anchor="sec_tsn_mpls_dt_dp_scen">
       <t>
-        [Author's note: this section to be moved to TSN over mpls sol draft]
+        [Author's note: this section to be moved to TSN over mpls sol
+        draft - TBD-TSN-OVER-DETNET]
       </t>
 
 
